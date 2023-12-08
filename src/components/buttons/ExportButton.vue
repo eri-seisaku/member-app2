@@ -42,8 +42,6 @@ onMounted(async () => {
       joinDate: doc.joinDate,
     }));
 
-    console.log(csvData.value)
-
   } catch (error) {
     errorMessage.value = error;
     emit('update:errorMessage', errorMessage.value); // 子から親へ

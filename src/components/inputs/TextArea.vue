@@ -1,25 +1,25 @@
 <template>
-  <v-text-field
-    density="compact"
-    variant="outlined"
+  <v-textarea
     v-model="parentField.value.value"
-    :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-    :type="visible ? 'text' : 'password'"
-    @click:append-inner="visible = !visible"
     :error-messages="parentField.errorMessage.value"
-    persistent-hint
     :hint="hint"
-  ></v-text-field>
+    :rows="rows"
+    persistent-hint
+    persistent-counter
+    counter
+    variant="outlined"
+    auto-grow
+  ></v-textarea>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-const visible = ref(false);
+import { computed } from 'vue';
 
 // 親から子へ
 const props = defineProps({
   field: Object,
-  hint: String
+  hint: String,
+  rows: Number
 });
 
 // 子から親へ

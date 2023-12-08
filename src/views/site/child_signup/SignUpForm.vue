@@ -55,7 +55,7 @@
       <RequiredLabel label="パスワード" />
     </v-col>
     <v-col cols="12" md="8">
-      <PasswordField :field="password" />
+      <PasswordFieldWithChip :field="password" />
     </v-col>
   </v-row>
   <!-- /password -->
@@ -146,7 +146,7 @@ const message = ref(''); // 郵便番号検索時のメッセージ
 // components
 import TextField from '@/components/inputs/TextField.vue';
 import SelectField from '@/components/inputs/SelectField.vue';
-import PasswordField from '@/components/inputs/PasswordField.vue';
+import PasswordFieldWithChip from '@/components/inputs/PasswordFieldWithChip.vue';
 import CheckBox from '@/components/inputs/CheckBox.vue';
 import RequiredLabel from '@/components/inputs/helpers/RequiredLabel.vue';
 import OptionalLabel from '@/components/inputs/helpers/OptionalLabel.vue';

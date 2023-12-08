@@ -167,6 +167,14 @@ export const authSchema = object({
   password: string().required(),
 });
 
+// Profile Page - Resume
+export const resumeSchema = object({
+  jobType: string().max(50, "50文字以下で入力してください"), // 職種
+  shortCareer: string().max(200, "200文字以下で入力してください"), // 略歴
+  businessFields: string().max(200, "200文字以下で入力してください"), // 主な事業分野
+  career: string().max(200, "200文字以下で入力してください"), // 経歴
+});
+
 // Portfolio Page
 export const portfolioValidationSchema = object({
   title: string().required(),
@@ -180,3 +188,5 @@ export const portfolioValidationSchema = object({
   }),
   website: string().url('有効なURLを入力してください。').nullable(),
 });
+
+

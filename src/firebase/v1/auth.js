@@ -5,7 +5,8 @@ import {
   signOut, // ログアウト
   EmailAuthProvider, // 再認証に必要?
   reauthenticateWithCredential, // 再認証
-  updateEmail, // email更新
+  verifyBeforeUpdateEmail, // email更新
+  // updateEmail, // email更新 // 廃止？
   updatePassword, // password更新
   sendEmailVerification, // メールアドレス変更後確認メール送信
   sendPasswordResetEmail, // パスワードの再設定メール送信
@@ -22,7 +23,7 @@ export async function getCurrentUser() {
 async function checkEmailDuplicate(email) {
   try {
     const providers = await fetchSignInMethodsForEmail(auth, email);
-    
+
     if (providers && providers.length > 0) {
       throw new Error("このメールアドレスは既に登録されています。");
     }
@@ -77,7 +78,7 @@ async function reauthenticate(user, loginPassword) {
     await reauthenticateWithCredential(user, credential);
     return;
   } catch (error) {
-    console.error('ログアウトエラーby Auth', error);
+    console.error('Auth:再認証エラー', error);
     throw error;
   }
 }
@@ -94,7 +95,8 @@ export async function updateEmailByAuth(currentPassword, newEmail) {
       // 再認証
       await reauthenticate(user, currentPassword)
       // メールアドレスを更新
-      await updateEmail(user, newEmail);
+      await verifyBeforeUpdateEmail(user, newEmail);
+      // await updateEmail(user, newEmail);
 
       // 更新したメールアドレスに確認メールを送信
       await sendEmailVerification(user);

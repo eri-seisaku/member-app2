@@ -3,15 +3,15 @@
     <template v-slot:content>
       <v-row no-gutters>
         <v-col cols="12">
-          <p class="mb-4">確認のため新しいメールアドレスにメールを送信します。</p>
-          <NormalLabel label="現在のメールアドレス" />
+          <p class="mb-4">退会前の説明など制作中</p>
+          <!-- <NormalLabel label="現在のメールアドレス" />
           <v-text-field
             :model-value="props.authData.email"
             disabled
             density="compact"
             variant="outlined"
-          ></v-text-field>
-          <form @submit.prevent="submit">
+          ></v-text-field> -->
+          <!-- <form @submit.prevent="submit">
             <v-row no-gutters>
               <v-col cols="12">
                 <NormalLabel label="新しいメールアドレス" />
@@ -34,7 +34,7 @@
                 </v-btn>
               </v-col>
             </v-row>
-          </form>
+          </form> -->
           <Alert
             v-if="message"
             color="primary"

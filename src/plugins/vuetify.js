@@ -1,8 +1,12 @@
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
+// import { VForm } from 'vuetify/lib/components/index'
 
 export default createVuetify({
+  // components: {
+  //   VForm,
+  // },
   theme: {
     defaultTheme: 'customTheme',
     themes: {
@@ -15,7 +19,7 @@ export default createVuetify({
           member: '#600f18',
           white: '#fff',
           gray: '#808080',
-          background: "#f5f5f5",
+          background: "#EEEEEE",
           anchor: '#000000',
         },
       },

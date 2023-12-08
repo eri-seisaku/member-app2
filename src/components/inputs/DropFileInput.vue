@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="submit">
+  <div>
     <div
       v-if="uploadMode"
       @drop.prevent="dropFile"
@@ -27,9 +27,17 @@
           >
       <!-- /中身 -->
     </div>
-    <v-row v-if="files.length && previewUrl">
+    <v-row v-if="files.length && previewURL">
       <v-col cols="12" class="text-center">
-        <Avatar :imageSrc="previewUrl" />
+        <Avatar
+          v-if="props.type === 'circle'" :imageSrc="previewURL"
+          :size="150"
+        />
+        <v-img
+          v-else
+          max-height="200"
+          :src="previewURL"
+        />
       </v-col>
       <v-col cols="12" class="d-flex flex-column flex-md-row justify-center">
         <v-btn
@@ -40,27 +48,25 @@
         >
         キャンセル
         </v-btn>
-        <v-btn
-          class="mx-8"
-          type="submit"
-          variant="outlined"
-        >
-        プロフィール写真として保存
-        </v-btn>
+        <slot name="action"></slot>
       </v-col>
     </v-row>
-  </form>
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-
 const uploadMode = ref(true); // モード切替
 const files = ref([]);
 const targetFile = ref([]);
-const previewUrl = ref(''); // プレビューurl
+const previewURL = ref(''); // プレビューurl
 const dragover = ref(false);
 const errorMessage = ref('');
+
+// 親から子へ
+const props = defineProps({
+  type: String
+});
 
 // validation
 import { validationSchema } from '@/validate/validate';
@@ -70,8 +76,9 @@ import Avatar from '@/components/Avatar.vue';
 
 // 子から親へ
 const emit = defineEmits([
-  'update:filesUploaded', // ファイル情報
-  'update:errorMessage' // エラーメッセージ
+  'update:errorMessage',
+  'update:fileData',
+  'update:previewURL'
 ]);
 
 // ボタンでアプロード
@@ -95,7 +102,6 @@ const addFiles = (files) => {
   if (files.length > 1) {
     errorMessage.value = "一度にアップロードできるファイルは 1 つだけです。";
     emit('update:errorMessage', errorMessage.value);
-
   } else {
     errorMessage.value = "";
     validateImage(files[0]);
@@ -109,9 +115,11 @@ const validateImage = (file) => {
   try {
     schema.validateSync(file);
     errorMessage.value = ''; // バリデーション成功時
-    previewUrl.value = URL.createObjectURL(file);
+    previewURL.value = URL.createObjectURL(file);
+    emit('update:previewURL', previewURL.value);
     uploadMode.value = false;
     files.value.push(file); // ファイルを追加
+    emit('update:fileData', files.value);
   } catch (error) {
     // バリデーションエラー時
     errorMessage.value = error.message;
@@ -125,16 +133,6 @@ const deleteFile = (index) => {
   uploadMode.value = true;
 }
 
-const submit = () => {
-  if (files.value.length > 0) {
-    // console.log(files.value);
-    errorMessage.value = '';
-    emit('update:filesUploaded', files.value);
-  } else {
-    errorMessage.value = "アップロードするファイルがありません。";
-    emit('update:errorMessage', errorMessage.value);
-  }
-}
 </script>
 
 <style>

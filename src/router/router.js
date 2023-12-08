@@ -105,6 +105,12 @@ const adminRoutes = [
         component: () => import('@/views/admin/administrator/Approval.vue'),
         meta: { title: 'APPROVAL', index: 4 }
       },
+      {
+        path: '/admin/test',
+        name: 'Test',
+        component: () => import('@/views/admin/Test.vue'),
+        meta: { title: 'TEST'}
+      },
     ],
   },
 ];

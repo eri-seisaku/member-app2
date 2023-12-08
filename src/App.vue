@@ -6,6 +6,13 @@
 
 </script>
 <style>
+/* 初期設定 */
+ul {
+  list-style: none;
+}
+.cursor {
+  cursor: pointer;
+}
 /* scrollbarの装飾 */
 ::-webkit-scrollbar{
   width: 10px;

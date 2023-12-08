@@ -4,7 +4,9 @@
       <v-col cols="12">
         <v-sheet class="pa-6" rounded>
           <p class="mb-8">エクスポート</p>
-          <ExportButton />
+          <ExportButton
+            @update:errorMessage="handleError"
+          />
         </v-sheet>
       </v-col>
       <v-col cols="12">
@@ -53,6 +55,12 @@ const handleFilesImport = async (file) => {
     errorMessage.value = error;
     console.error('ユーザー情報の更新に失敗しました。', error);
   }
+}
+
+// エラーメッセージ取得
+const handleError = (error) => {
+  errorMessage.value = error;
+  console.error('ユーザー情報の更新に失敗しました。', error);
 }
 
 </script>
