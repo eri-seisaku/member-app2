@@ -7,7 +7,7 @@
       >
         ファイルを選択
       </v-btn>
-      <ul v-if="fileName && files" class="d-flex align-center my-4 my-md-0">
+      <ul v-if="fileName && fileData" class="d-flex align-center my-4 my-md-0">
         <li>
           <span class="mx-4">{{ fileName }}</span>
           <v-icon
@@ -24,15 +24,20 @@
       type="file"
       @change="handleFileInput"
     >
-    <div v-if="errorMessage" class="custom-error-message d-flex align-end justify-space-between">
+    <!-- <div v-if="errorMessage" class="custom-error-message d-flex align-end justify-space-between">
       {{ errorMessage }}
+    </div> -->
+    <!-- エラーメッセージ -->
+    <div class="v-input__details">
+      <div class="error-message text-error" :class="{ show: errorMessage }">{{ errorMessage }}</div>
     </div>
+    <!-- /エラーメッセージ -->
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-const files = ref([]);
+const fileData = ref([]);
 const fileName = ref('');
 const targetFile = ref([]);
 const previewURL = ref(''); // プレビューurl
@@ -40,11 +45,8 @@ const errorMessage = ref('');
 
 // 親から子へ
 const props = defineProps({
-  type: String
+  schema: Object
 });
-
-// validation
-import { validationSchema } from '@/validate/validate';
 
 // 子から親へ
 const emit = defineEmits([
@@ -57,20 +59,21 @@ const emit = defineEmits([
 const fileInput = ref(null);
 const openFileInput = () => fileInput.value.click();
 
-// ファイル入力を処理する
+// ファイルを追加する
 const handleFileInput = (e) => {
   targetFile.value = e.target.files;
   const file = targetFile.value[0];
   validateImage(file);
   if (errorMessage.value === '') {
-    updatePreviewURL(file);
+    setPreviewURL(file);
     addFile(file);
   }
 };
 
 // バリデーション
 const validateImage = (file) => {
-  const schema = validationSchema.fields.image;
+  // 画像のバリデーションルールを適用
+  const schema = props.schema;
   try {
     schema.validateSync(file);
     errorMessage.value = '';
@@ -80,22 +83,22 @@ const validateImage = (file) => {
 };
 
 // プレビューURLの生成と更新
-const updatePreviewURL = (file) => {
+const setPreviewURL = (file) => {
   previewURL.value = URL.createObjectURL(file);
   emit('update:previewURL', previewURL.value);
 };
 
 // ファイルの追加
 const addFile = (file) => {
-  files.value = file;
-  fileName.value = files.value.name;
-  emit('update:fileData', files.value);
+  fileData.value = file;
+  fileName.value = fileData.value.name;
+  emit('update:fileData', fileData.value);
 };
 
 
 // ファイル削除
-const deleteFile = (index) => {
-  files.value = [];
+const deleteFile = () => {
+  fileData.value = [];
   fileName.value = "";
   emit('update:deleteFileData');
 }
@@ -103,17 +106,16 @@ const deleteFile = (index) => {
 </script>
 
 <style>
-.drop_area {
-  width: 100%;
-  min-height: 200px;
-  border: 5px solid gray;
-  border-radius: 15px;
-  color: gray;
+.error-message {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  transform: translateY(-20px);
 }
-.enter {
-  border: 5px solid #1867C0;
-  color: #1867C0;
+.error-message.show {
+  opacity: 1;
+  transform: translateY(0);
 }
+/*
 .custom-spacing {
   margin-top: 22px;
 }
@@ -128,4 +130,5 @@ const deleteFile = (index) => {
   color: rgb(var(--v-theme-error));
   line-height: 12px;
 }
+*/
 </style>

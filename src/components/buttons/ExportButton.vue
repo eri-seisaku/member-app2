@@ -1,6 +1,6 @@
 <template>
   <download-csv :data="csvData">
-    <v-btn variant="outlined">
+    <v-btn variant="outlined" min-height="40">
       <v-icon start icon="mdi-file-export-outline"></v-icon>
       EXPORT
     </v-btn>

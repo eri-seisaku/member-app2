@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12" class="pa-4">
       <form @submit.prevent="submit">
-        <!-- ------------------------------ -->
+        <!-- 顔写真 -->
         <v-row no-gutters>
           <v-col cols="12" md="6">
             <NormalLabel label="顔写真" />
@@ -13,6 +13,7 @@
                 rounded="0"
               />
               <FileInputButton
+                :schema="resumeSchema.fields.image"
                 @update:fileData="handleFileData"
                 @update:previewURL="handlePreviewURL"
                 @update:deleteFileData="handleDeleteFileData"
@@ -20,7 +21,7 @@
             </div>
           </v-col>
         </v-row>
-        <!-- ------------------------------ -->
+        <!-- /顔写真 -->
         <v-row v-for="fieldInfo in resumeFields" :key="fieldInfo.key">
           <v-col cols="12" md="6">
             <NormalLabel :label="fieldInfo.label" />
@@ -67,8 +68,11 @@ const props = defineProps({
   authUID: String,
   dbData: Object
 });
-// 親からもらった画像データ
-imageSrc.value = props.dbData.profileIcon ? props.dbData.profileIcon : '';
+
+if (props.dbData.profileIcon) {
+  imageSrc.value = props.dbData.profileIcon.url;
+}
+
 
 // components
 import Alert from '@/components/Alert.vue';
@@ -105,24 +109,22 @@ onMounted(async () => {
 
 // firebase
 import { upload } from '@/firebase/v1/storage';
-import { updateOneLevelData } from '@/firebase/v1/firestore';
+import { updateOneLevelSingleData } from '@/firebase/v1/firestore';
 // utils
 import { formatFormValues } from '@/utils/formatData';
 
 // 送信処理
 const submit = handleSubmit(async (values) => {
-  console.log(values)
-  console.log(fileData.value);
   try {
-    let url;
+    let uploadResult;
     if (fileData.value) {
-      url = await upload("profile", fileData.value, props.authUID);
+      uploadResult = await upload("profile", fileData.value, props.authUID);
     }
     const formattedInputData = formatFormValues(values);
-    if (url) {
-      formattedInputData.profileIcon = url;
+    if (uploadResult) {
+      formattedInputData.profileIcon = uploadResult;
     }
-    await updateOneLevelData(props.authUID, "members", formattedInputData);
+    await updateOneLevelSingleData(props.authUID, "members", formattedInputData);
     message.value = '更新に成功しました。';
   } catch (error) {
     console.error('更新エラー', error);
@@ -133,7 +135,11 @@ const submit = handleSubmit(async (values) => {
 // 画像処理
 const handleFileData = (file) => {
   console.log(file);
-  fileData.value = file;
+  if (file) {
+    fileData.value = file;
+  } else {
+    errorMessage.value = "アップロードするファイルがありません。";
+  }
 }
 const handlePreviewURL = (url) => {
   imageSrc.value = url;

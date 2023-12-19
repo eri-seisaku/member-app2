@@ -59,12 +59,12 @@ const route = useRoute();
 import Accordion from '@/views/site/child_detail/Accordion.vue';
 
 // firebase
-import { getOneLevelData } from '@/firebase/v1/firestore';
+import { getOneLevelSingleData } from '@/firebase/v1/firestore';
 
 
 onMounted(async () => {
   try {
-    readData.value = await getOneLevelData(route.params.userID, "members");
+    readData.value = await getOneLevelSingleData(route.params.userID, "members");
 
     lists.value = [
       {

@@ -48,7 +48,7 @@ const props = defineProps({
 // console.log(props.userID);
 
 // firebase
-import { getTwoLevelAllData } from '@/firebase/v1/firestore';
+import { getTwoLevelUserData } from '@/firebase/v1/firestore';
 
 // utils
 import { formatDateForTimestamp } from '@/utils/formatData'; // 日付形式変換
@@ -56,7 +56,7 @@ import { formatDateForTimestamp } from '@/utils/formatData'; // 日付形式変�
 // 取得
 onMounted(async () => {
   try {
-    const allDoc = await getTwoLevelAllData(props.userID, 'portfolios', 'portfolio');
+    const allDoc = await getTwoLevelUserData(props.userID, 'portfolios', 'portfolio');
 
     portfolios.value = allDoc.map((doc) => ({
       title: doc.title,

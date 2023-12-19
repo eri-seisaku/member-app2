@@ -7,7 +7,7 @@ import {
 
 // firebase
 import { getCurrentUser } from '@/firebase/v1/auth';
-import { getOneLevelData } from '@/firebase/v1/firestore';
+import { getOneLevelSingleData } from '@/firebase/v1/firestore';
 
 // utils
 import { role } from '@/utils/category'; // 権限
@@ -111,6 +111,12 @@ const adminRoutes = [
         component: () => import('@/views/admin/Test.vue'),
         meta: { title: 'TEST'}
       },
+      {
+        path: '/admin/sample-post',
+        name: 'SamplePost',
+        component: () => import('@/views/admin/SamplePost.vue'),
+        meta: { title: 'SamplePost'}
+      },
     ],
   },
 ];
@@ -154,7 +160,7 @@ router.beforeEach(async (to, from, next) => {
   } else if (requiresAuth) {
     try {
       // ログイン済みのユーザーのFirestoreから権限情報を取得
-      const userData = await getOneLevelData(user.uid, 'members');
+      const userData = await getOneLevelSingleData(user.uid, 'members');
       const userRole = userData.role;
 
       if (to.path.startsWith('/admin/administrator/') && userRole !== role.administrator) {

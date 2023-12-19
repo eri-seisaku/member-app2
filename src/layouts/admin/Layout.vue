@@ -29,7 +29,7 @@
         >
         <v-img
           cover
-          :src="userData.profileIcon"
+          :src="imageSrc"
           aspect-ratio="1/1"
         ></v-img>
         </v-avatar>
@@ -97,7 +97,9 @@ const color = ref('');
 const navMenus = ref([]);
 const user = ref({}); // authのデータ用
 const userData = ref({}); // firestoreのデータ用
+const imageSrc = ref('');
 const linkHeight = ref(50); // 動く矢印用
+const isReady = ref(false);
 
 // router
 import { useRoute, useRouter } from "vue-router";
@@ -109,7 +111,7 @@ import MoveArrow from '@/components/MoveArrow.vue';
 
 // ページのタイトルを取得
 const arrowMovePx = computed(() => {
-  console.log(route.meta.index);
+  // console.log(route.meta.index);
   return route.meta.index * linkHeight.value;
 });
 
@@ -120,7 +122,7 @@ const title = computed(() => {
 
 // firebase
 import { getCurrentUser, logout } from '@/firebase/v1/auth';
-import { getOneLevelData } from '@/firebase/v1/firestore';
+import { getOneLevelSingleData } from '@/firebase/v1/firestore';
 
 // menu
 import { getMenu } from '@/router/menu';
@@ -132,7 +134,11 @@ import { role } from '@/utils/category'; // 権限
 onMounted(async () => {
   try {
     user.value = await getCurrentUser();
-    userData.value = await getOneLevelData(user.value.uid, "members");
+    userData.value = await getOneLevelSingleData(user.value.uid, "members");
+
+    if (userData.value.profileIcon && userData.value.profileIcon.url) {
+      imageSrc.value = userData.value.profileIcon.url;
+    }
 
     navMenus.value = getMenu(user.value, userData.value.role);
 
@@ -141,6 +147,8 @@ onMounted(async () => {
     } else {
       color.value = 'member';
     }
+
+    isReady.value = true;
 
   } catch (error) {
     console.error('ユーザーデータ取得エラー', error);

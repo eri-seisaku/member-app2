@@ -1,34 +1,26 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <!-- テストエリア -->
-        <!-- /テストエリア -->
-      </v-col>
-    </v-row>
-  </v-container>
+  <!-- vuetifyを使ったサンプル -->
+  <v-select
+    dense
+    :items="options"
+    @input="handleSelect"
+    v-model="selectValue"
+  >
+  </v-select>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+const options = [
+  'メンバー',
+  'ポートフォリオ',
+];
 
-// 親から子へ
-const props = defineProps({
+const selectValue = ref('');
 
-});
-
-// 子から親へ
-const emit = defineEmits([
-
-]);
-
-// components
-
-
-// firebase
-
-
+const handleSelect = () => {
+  if (selectValue === 'メンバー') {
+    console.log('イベント発火！');
+  }
+};
 </script>
-<style>
-
-</style>

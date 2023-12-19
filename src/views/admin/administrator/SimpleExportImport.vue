@@ -3,18 +3,18 @@
     <v-row>
       <v-col cols="12">
         <v-sheet class="pa-6" rounded>
-          <h3 class="text-h5">エクスポート</h3>
+          <h3 class="text-subtitle-1">エクスポート</h3>
           <v-divider class="my-4"></v-divider>
-            <SelectExport
-              @update:errorMessage="handleError"
-            />
+          <ExportButton
+            @update:errorMessage="handleError"
+          />
         </v-sheet>
       </v-col>
       <v-col cols="12">
         <v-sheet class="pa-6" rounded>
-          <h3 class="text-h5">インポート</h3>
+          <h3 class="text-subtitle-1">インポート</h3>
           <v-divider class="my-4"></v-divider>
-          <SelectImport
+          <ImportButton
             @fileImport="handleFilesImport"
           />
         </v-sheet>
@@ -33,27 +33,25 @@
 
 <script setup>
 import { ref } from 'vue';
+
 const message = ref('');
 const errorMessage = ref('');
-
-// components
-import SelectExport from '@/components/SelectExport.vue';
-import SelectImport from '@/components/SelectImport.vue';
-import Alert from '@/components/Alert.vue';
 
 // firebase
 import { setOneLevelMultipleData } from '@/firebase/v1/firestore';
 
-// ファイルがアップロードされた時
-const handleFilesImport = async (selected, file) => {
-  try {
-    if (selected === 'メンバー') {
-      await setOneLevelMultipleData("members", file);
-    } else if (selected === 'ポートフォリオ') {
-      message.value = '制作中です';
-    } else {
+// components
+import ImportButton from '@/components/buttons/ImportButton.vue';
+import ExportButton from '@/components/buttons/ExportButton.vue';
+import Alert from '@/components/Alert.vue';
 
-    }
+
+// ファイルがアップロードされた時
+const handleFilesImport = async (file) => {
+  // console.log('jsondata:', file); // デバック
+  try {
+    await setOneLevelMultipleData("members", file);
+    // 入会年月日が文字列でエラーになる
     message.value = 'ユーザー情報の更新に成功しました。';
   } catch (error) {
     errorMessage.value = error;
@@ -68,8 +66,3 @@ const handleError = (error) => {
 }
 
 </script>
-<style>
-.custom-width {
-  max-width: 200px;
-}
-</style>

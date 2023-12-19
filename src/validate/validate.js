@@ -1,4 +1,3 @@
-// import * as yup from 'yup'; // 全て
 import { setLocale } from 'yup';
 import { object, string, mixed } from 'yup';
 
@@ -22,7 +21,7 @@ const isValidDate = (value) => {
 
 const fileTypeTest = () => {
   return mixed().test('fileType', 'PNG、JPG、GIF、PDF、DOC、DOCX、PPT、PPTX形式の画像をアップロードしてください', (value) => {
-    if (!value) return true; // 値がない場合、バリデーションをスキップ
+    if (!value) return true;
     return (
       value && (
         value.type === 'image/png' ||
@@ -33,6 +32,21 @@ const fileTypeTest = () => {
         value.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
         value.type === 'application/vnd.ms-powerpoint' ||
         value.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      )
+    );
+  });
+};
+
+const imageTypeTest = () => {
+  return mixed().test('fileType', 'PNG、JPG、WEBP、GIF、SVG形式の画像をアップロードしてください', (value) => {
+    if (!value) return true;
+    return (
+      value && (
+        value.type === 'image/png' ||
+        value.type === 'image/jpeg' ||
+        value.type === 'image/webp' ||
+        value.type === 'image/gif' ||
+        value.type === 'image/svg+xml'
       )
     );
   });
@@ -84,7 +98,7 @@ const individualSchema = {
   }),
 };
 
-// SignUp Page
+// 会員登録
 export const validationSchema = object({
   ...commonSchema, // 共通
   // ...corporationSchema, // 法人
@@ -144,10 +158,10 @@ export const validationSchema = object({
   checkbox: string().oneOf(['1'], 'チェックする必要があります。').required(),
 });
 
-// Profile Page
+// プロフィール
 export const profileSchema = commonSchema;
 
-// Profile Page - PasswordDialog
+// プロフィール - パスワード更新
 export const passwordSchema = object({
   currentPassword: string().required(),
   newPassword: string()
@@ -161,32 +175,53 @@ export const passwordSchema = object({
     confirmPassword: string().required(),
 });
 
-// Profile Page - MailDialog
+// プロフィール - メールアドレス更新
 export const authSchema = object({
   email: string().email().required(),
   password: string().required(),
 });
 
-// Profile Page - Resume
+// プロフィール - 職務経歴更新
 export const resumeSchema = object({
   jobType: string().max(50, "50文字以下で入力してください"), // 職種
   shortCareer: string().max(200, "200文字以下で入力してください"), // 略歴
   businessFields: string().max(200, "200文字以下で入力してください"), // 主な事業分野
   career: string().max(200, "200文字以下で入力してください"), // 経歴
-});
-
-// Portfolio Page
-export const portfolioValidationSchema = object({
-  title: string().required(),
-  comment: string(),
   image: mixed()
     .test('fileType', 'PNGまたはJPG形式の画像をアップロードしてください', (value) => {
-    if (!value) return true; // 値がない場合、バリデーションをスキップ
+    if (!value) return true;
     return (
       value && (value.type === 'image/png' || value.type === 'image/jpeg')
     );
   }),
-  website: string().url('有効なURLを入力してください。').nullable(),
 });
 
-
+// ポートフォリオ
+export const portfolioSchema = object({
+  state: string(),
+  title: string().when('state', {
+    is: (value) => value === 'request',
+    then: () => string().required(),
+    otherwise: () => string(),
+  }),
+  portfolioURL: string().when('state', {
+    is: (value) => value === 'request',
+    then: () => string().url('有効なURLを入力してください').nullable().required(),
+    otherwise: () => string().url('有効なURLを入力してください').nullable(),
+  }),
+  genre: string().when('state', {
+    is: (value) => value === 'request',
+    then: () => string().max(50, "50文字以下で入力してください").required(),
+    otherwise: () => string().max(50, "50文字以下で入力してください"),
+  }),
+  comment: string().when('state', {
+    is: (value) => value === 'request',
+    then: () => string().max(200, "200文字以下で入力してください").required(),
+    otherwise: () => string().max(200, "200文字以下で入力してください"),
+  }),
+  portfolioImage: string().when('state', {
+    is: (value) => value === 'request',
+    then: () => imageTypeTest().required(),
+    otherwise: () => imageTypeTest(),
+  }),
+});

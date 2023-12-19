@@ -44,6 +44,18 @@
                   class="mr-3"
                   return-object
                 ></v-select>
+                <!-- <v-select
+                  v-model="selectedAction"
+                  density="compact"
+                  label="一括操作"
+                  item-text="title"
+                  item-value="value"
+                  :items="selectItems"
+                  variant="outlined"
+                  hide-details
+                  class="mr-3"
+                  return-object
+                ></v-select> -->
                 <v-btn
                   min-height="40"
                   variant="outlined"
@@ -63,22 +75,6 @@
             :items="portfolios"
             :loading="loading"
           >
-            <!-- 修正中 -->
-            <template v-slot:headers>
-              <tr>
-                <th>
-                  <v-checkbox
-                    hide-details
-                    @click="toggleSelectAllItems"
-                  ></v-checkbox>
-                </th>
-                <th>{{ headers[1].title }}</th>
-                <th>{{ headers[2].title }}</th>
-                <th>{{ headers[3].title }}</th>
-                <th>{{ headers[4].title }}</th>
-              </tr>
-            </template>
-            <!-- 修正中 -->
             <template v-slot:item.requestReady="{ item }">
               <v-checkbox
                 v-if="item.requestReady && item.state === 'save' && selectedAction.value === 'request'"
@@ -95,7 +91,6 @@
             </template>
             <template v-slot:item.state="{ item }">
               <v-chip :color="getColor(item.state, item.requestReady)">
-                <!-- {{ item.state === 'request' ? '申請中' : '下書き' }} -->
                 {{
                   item.state === 'request' && item.requestReady
                     ? '申請中'
@@ -131,7 +126,6 @@ import { ref, onMounted, watch } from "vue";
 const user = ref({});
 const portfolios = ref([]);
 const selected = ref([]); // 投稿ID
-const allSelected = ref(false);
 const selectedAction = ref([]); // 削除or申請
 const message = ref('');
 const errorMessage = ref('');
@@ -161,17 +155,6 @@ const getColor = (state, requestReady) => {
   if (state === 'request') return 'green'
   else if (state === 'save' && requestReady === true) return 'primary'
   else return 'gray'
-};
-
-const toggleSelectAllItems = () => {
-  if (allSelected.value) {
-    selected.value = [];
-  } else {
-    for (let item of portfolios.value) {
-      selected.value.push(item.id);
-    }
-  }
-  allSelected.value = !allSelected.value; // 選択状態を反転
 };
 
 // component
@@ -204,7 +187,7 @@ onMounted(async () => {
       comment: doc.comment,
       state: doc.state,
       portfolioURL: doc.portfolioURL,
-      portfolioImage: doc.portfolioImage ? doc.portfolioImage.url : null,
+      portfolioImage: doc.portfolioImage.url,
       createDateTimestamp: formatDateForTimestamp(doc.createDateTimestamp),
       requestReady: doc.requestReady
     }));

@@ -37,10 +37,11 @@
 
         <v-card-text class="bg-white custom-radius">
           <v-window v-model="tab">
+
             <v-window-item value="info">
               <ProfileInfo
                 v-if="isReady"
-                :authUID="user.uid"
+                :authUID="userID"
                 :dbData="userDoc"
               />
             </v-window-item>
@@ -48,7 +49,7 @@
             <v-window-item value="resume">
               <Resume
                 v-if="isReady"
-                :authUID="user.uid"
+                :authUID="userID"
                 :dbData="userDoc"
               />
             </v-window-item>
@@ -71,6 +72,7 @@
 import { ref, onMounted } from 'vue';
 const tab = ref(null);
 const user = ref({});
+const userID = ref('');
 const userDoc= ref({});
 const errorMessage = ref('');
 const isReady = ref(false);
@@ -81,15 +83,32 @@ import ProfileInfo from '@/views/admin/child_profile/ProfileInfo.vue';
 import Resume from '@/views/admin/child_profile/Resume.vue';
 import Account from '@/views/admin/child_profile/Account.vue';
 
+// route
+import { useRoute } from 'vue-router';
+const route = useRoute();
+
 // firebase
 import { getCurrentUser } from '@/firebase/v1/auth';
-import { getOneLevelData } from '@/firebase/v1/firestore';
+import { getOneLevelSingleData } from '@/firebase/v1/firestore';
+
 
 onMounted(async () => {
   try {
-    user.value = await getCurrentUser();
+    // user.value = await getCurrentUser();
+    if (route.params.userID) {
+      userID.value = route.params.userID;
+    } else {
+      const currentUser = await getCurrentUser();
+      userID.value = currentUser.uid;
+    }
 
-    userDoc.value = await getOneLevelData(user.value.uid, "members");
+    userDoc.value = await getOneLevelSingleData(userID.value, "members");
+
+    // authのメールアドレスにするか検討中
+    user.value = {
+      uid: userID.value,
+      email: userDoc.value.email
+    }
 
     isReady.value = true;
 

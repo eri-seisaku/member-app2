@@ -83,7 +83,7 @@ const password = useField('password');
 
 // firebase
 import { updateEmailByAuth } from '@/firebase/v1/auth';
-import { updateOneLevelData } from '@/firebase/v1/firestore';
+import { updateOneLevelSingleData } from '@/firebase/v1/firestore';
 
 const submit = handleSubmit(async (values) => {
   try {
@@ -95,7 +95,7 @@ const submit = handleSubmit(async (values) => {
       email: values.email
     };
 
-    await updateOneLevelData(props.authData.uid, "members", userData);
+    await updateOneLevelSingleData(props.authData.uid, "members", userData);
 
     handleReset();
 

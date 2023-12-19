@@ -13,7 +13,7 @@
       <v-icon size="60">mdi-cloud-upload</v-icon>
         <p class="text-center">ここに写真をドラッグ<br>又は</p>
           <v-btn
-            color="primary"
+            variant="outlined"
             @click="openFileInput"
           >
             ファイルを選択
@@ -27,10 +27,15 @@
           >
       <!-- /中身 -->
     </div>
-    <v-row v-if="files.length && previewURL">
+    <!-- エラーメッセージ -->
+    <div class="v-input__details pl-4">
+      <div class="error-message text-error" :class="{ show: errorMessage }">{{ errorMessage }}</div>
+    </div>
+    <!-- /エラーメッセージ -->
+    <v-row v-if="fileData && previewURL">
       <v-col cols="12" class="text-center">
         <Avatar
-          v-if="props.type === 'circle'" :imageSrc="previewURL"
+          v-if="props.type === 'avatar'" :imageSrc="previewURL"
           :size="150"
         />
         <v-img
@@ -55,9 +60,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 const uploadMode = ref(true); // モード切替
-const files = ref([]);
+const fileData = ref([]);
 const targetFile = ref([]);
 const previewURL = ref(''); // プレビューurl
 const dragover = ref(false);
@@ -65,70 +70,84 @@ const errorMessage = ref('');
 
 // 親から子へ
 const props = defineProps({
-  type: String
+  type: String,
+  schema: Object,
+  error: String,
+  filePath: String,
 });
 
-// validation
-import { validationSchema } from '@/validate/validate';
+watch(() => props.error, (newVal) => {
+  errorMessage.value = newVal;
+});
 
 // component
 import Avatar from '@/components/Avatar.vue';
 
 // 子から親へ
 const emit = defineEmits([
-  'update:errorMessage',
   'update:fileData',
-  'update:previewURL'
+  'update:deleteFileData'
 ]);
 
 // ボタンでアプロード
 const fileInput = ref(null);
 const openFileInput = () => fileInput.value.click();
-
 const handleFileInput = (e) => {
   targetFile.value = e.target.files;
-  addFiles(targetFile.value);
+  handleFileUpload(targetFile.value[0]);
 }
 
 // ドロップでアプロード
 const dropFile = (e) => {
-  dragover.value = false; // ドロップが終わると枠線の色が変わる
-  targetFile.value = e.dataTransfer.files;
-  addFiles(targetFile.value);
+  dragover.value = false; // 枠線の色変更
+  console.log(e.dataTransfer.files.length)
+  if (e.dataTransfer.files.length === 1) {
+    targetFile.value = e.dataTransfer.files;
+    handleFileUpload(targetFile.value[0]);
+  } else {
+    errorMessage.value = "一度にアップロードできるファイルは 1 つだけです。";
+  }
 };
 
 // 共通: ファイルを追加する
-const addFiles = (files) => {
-  if (files.length > 1) {
-    errorMessage.value = "一度にアップロードできるファイルは 1 つだけです。";
-    emit('update:errorMessage', errorMessage.value);
-  } else {
-    errorMessage.value = "";
-    validateImage(files[0]);
+const handleFileUpload = (file) => {
+  errorMessage.value = "";
+  validateImage(file);
+  if (errorMessage.value === '') {
+    setPreviewURL(file);
+    addFile(file);
   }
 }
 
 // バリデーション
 const validateImage = (file) => {
-  // 画像のバリデーションルールを適用
-  const schema = validationSchema.fields.image;
+  const schema = props.schema;
   try {
     schema.validateSync(file);
-    errorMessage.value = ''; // バリデーション成功時
-    previewURL.value = URL.createObjectURL(file);
-    uploadMode.value = false;
-    files.value.push(file); // ファイルを追加
-    emit('update:fileData', files.value);
+    errorMessage.value = '';
   } catch (error) {
-    // バリデーションエラー時
     errorMessage.value = error.message;
-    emit('update:errorMessage', errorMessage.value);
   }
 };
 
+// プレビューURLの生成
+const setPreviewURL = (file) => {
+  console.log(file);
+  previewURL.value = URL.createObjectURL(file);
+}
+
+// ファイルの追加
+const addFile = (file) => {
+  fileData.value = file;
+  emit('update:fileData', fileData.value);
+  uploadMode.value = false;
+};
+
 // ファイル削除
-const deleteFile = (index) => {
-  files.value.splice(index, 1);
+const deleteFile = () => {
+  fileData.value = [];
+  previewURL.value = props.filePath ? props.filePath : '';
+  emit('update:deleteFileData');
   uploadMode.value = true;
 }
 
@@ -138,12 +157,21 @@ const deleteFile = (index) => {
 .drop_area {
   width: 100%;
   min-height: 200px;
-  border: 5px solid gray;
+  border: 5px dashed rgba(128, 128, 128, 0.38);
   border-radius: 15px;
   color: gray;
 }
 .enter {
   border: 5px solid #1867C0;
   color: #1867C0;
+}
+.error-message {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  transform: translateY(-20px);
+}
+.error-message.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>

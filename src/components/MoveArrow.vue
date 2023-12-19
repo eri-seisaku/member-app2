@@ -22,7 +22,7 @@ console.log(props);
 
 <style>
 .moving-arrow {
-  border-right: 17px solid #FAFAFA;
+  border-right: 17px solid #eee;
   border-top: 17px solid transparent;
   border-bottom: 17px solid transparent;
   display: inline-block;

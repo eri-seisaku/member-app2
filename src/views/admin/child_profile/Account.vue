@@ -11,9 +11,6 @@
             variant="outlined"
           ></v-text-field>
         </v-col>
-        <v-col cols="2" align-self="center">
-          <p class="mx-4">変更不可</p>
-        </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col cols="10" md="6">

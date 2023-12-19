@@ -26,6 +26,19 @@ export function formatFormValues(values) {
   }
   return formattedValues;
 }
-
+// export function formatFormValues(values) {
+//   const formattedValues = {};
+//   for (const key in values) {
+//     let trimmedAndFormattedValue = "";
+//     if (typeof values[key] === 'string') {
+//       trimmedAndFormattedValue = values[key].trim();
+//       const replacedFormattedValue = trimmedAndFormattedValue.replace(/[\u3000\s]/g, " ");
+//       formattedValues[key] = replacedFormattedValue;
+//     } else if (values[key] !== undefined) {
+//       formattedValues[key] = values[key];
+//     }
+//   }
+//   return formattedValues;
+// }
 
 

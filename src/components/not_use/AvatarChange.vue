@@ -42,12 +42,12 @@ import Avatar from '@/components/Avatar.vue';
 
 // firebase
 import { getCurrentUser } from '@/firebase/v1/auth';
-import { getOneLevelData } from '@/firebase/v1/firestore';
+import { getOneLevelSingleData } from '@/firebase/v1/firestore';
 
 onMounted(async () => {
   try {
     user.value = await getCurrentUser();
-    const userDoc = await getOneLevelData(user.value.uid, "members");
+    const userDoc = await getOneLevelSingleData(user.value.uid, "members");
     imageSrc.value = userDoc.profileIcon;
 
   } catch (error) {

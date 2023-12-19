@@ -1,116 +1,186 @@
 <template>
-  <v-container class="fill-height" fluid>
-    <v-row no-gutters>
-      <v-col cols="12">
-        <v-sheet class="pa-6" rounded>
-          <form @submit.prevent="submit">
-            <!-- title -->
-            <v-text-field
-              v-model="title"
-              label="TITLE"
-              required
-              variant="outlined"
-            ></v-text-field>
-            <!-- web site -->
-            <v-text-field
-              v-model="website"
-              label="WEB SITE"
-              variant="outlined"
-            ></v-text-field>
-            <!-- FILE -->
-            <v-file-input
-              label="FILE"
-              variant="outlined"
-              @change="uploadFile"
-             ></v-file-input>
-            <!-- comment -->
-            <v-textarea
-              v-model="comment"
-              label="COMMENT"
-              variant="outlined"
-              ></v-textarea>
-              <v-btn
-                type="submit"
-                variant="outlined"
-              >
-                SUBMIT
-              </v-btn>
-              <p>{{ message }}</p>
-              <p>{{ errorMessage }}</p>
+  <v-container>
+    <v-row>
+      <v-col cols="12" md="8">
+        <v-sheet class="pa-2 pa-sm-3 pa-md-6" rounded>
+          <form @submit.prevent="submit" id="postForm">
+            <NormalLabel label="ポートフォリオ画像" />
+            <DropFileInput
+              :schema="portfolioSchema.fields.portfolioImage"
+              v-model:error="portfolioImage.errorMessage.value"
+              @update:fileData="handleFileData"
+              @update:deleteFileData="handleDeleteFileData"
+            />
+            <NormalLabel label="タイトル" />
+            <TextField
+              :field="title"
+            />
+            <NormalLabel label="詳細URL" />
+            <TextField
+              :field="portfolioURL"
+            />
+            <NormalLabel label="分野" />
+            <TextArea
+              :field="genre"
+              hint="最大50文字まで"
+              :rows="2"
+            />
+            <NormalLabel label="コメント" />
+            <TextArea
+              :field="comment"
+              hint="最大200文字まで"
+              :rows="4"
+            />
           </form>
         </v-sheet>
+      </v-col>
+      <v-col cols="12" md="4">
+        <div class="sticky">
+          <v-sheet class="pa-2 pa-sm-3 pa-md-6" rounded>
+            <v-checkbox
+              v-model="state.value.value"
+              :true-value="'request'"
+              :false-value="'save'"
+              label="ポートフォリオを申請する"
+              persistent-hint
+              hint="申請する場合は全ての項目が入力必須です"
+            ></v-checkbox>
+            <div class="d-flex justify-end mt-6">
+              <v-btn
+                variant="flat"
+                color="member"
+                type="submit"
+                form="postForm"
+              >
+                保存
+              </v-btn>
+            </div>
+          </v-sheet>
+        </div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 <script setup>
 import { ref, onMounted } from "vue";
-// 初期値
-const title = ref('');
-const website = ref('');
-const fileData = ref('');
-const comment = ref('');
-
-const message = ref('');
+const user = ref({});
 const errorMessage = ref('');
 
-const user = ref('');
+// components
+import DropFileInput from '@/components/inputs/DropFileInput.vue';
+import NormalLabel from '@/components/inputs/helpers/NormalLabel.vue';
+import TextField from '@/components/inputs/TextField.vue';
+import TextArea from '@/components/inputs/TextArea.vue';
 
-const uploadFile = (e) => {
-  fileData.value = e.target.files[0]
-};
+// validate
+import { useField, useForm } from 'vee-validate';
+import { portfolioSchema } from '@/validate/validate';
+
+const { handleSubmit, handleReset } = useForm({
+  validationSchema: portfolioSchema,
+});
+
+const state = useField('state');
+const title = useField('title');
+const portfolioURL = useField('portfolioURL');
+const comment = useField('comment');
+const genre = useField('genre');
+const portfolioImage = useField('portfolioImage');
+
+// checkboxの初期値
+state.value.value = 'save';
+
+// デバック
+// watch(() => state.value.value, (newVal, oldVal) => {
+//   console.log('old', oldVal)
+//   console.log('new', newVal)
+// });
 
 // firebase
 import { upload } from '@/firebase/v1/storage';
 import { getCurrentUser } from '@/firebase/v1/auth';
-import { addOneLevelData, addTwoLevelData } from '@/firebase/v1/firestore';
+import { addTwoLevelSingleData, recordLog } from '@/firebase/v1/firestore';
+// utils
+import { formatFormValues } from '@/utils/formatData';
 
-// 取得
-onMounted(async () => {
+// router
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+onMounted(async() => {
   try {
     user.value = await getCurrentUser();
   } catch (error) {
-    console.error('データ取得エラー', error);
-    errorMessage.value = error;
+    console.error('ユーザー情報を読み込みできませんでした', error);
+    errorMessage.value = 'ユーザー情報を読み込みできませんでした';
   }
 });
 
-const submit = async () => {
-  if (!title.value || !website.value || !comment.value) {
-    alert ('すべて入力してください。')
-    return
-  }
+// 送信処理
+const submit = handleSubmit(async (values) => {
+  const { portfolioImage, ...otherValues } = values;
+  let uploadResult
+  // let uploadResult = {
+  //   name: '',
+  //   type: '',
+  //   url: ''
+  // };
   try {
-    // storageに保存
-    const url = await upload("portfolio", fileData.value, user.value.uid);
-
-    // firestoreに保存
-    const postData = {
-      title: title.value,
-      website: website.value,
-      comment: comment.value,
-      filePath: url,
-      date: new Date(),
+    if (portfolioImage !== undefined) {
+      uploadResult = await upload("portfolio", portfolioImage, user.value.uid);
     }
 
-    const secondDocID = await addTwoLevelData(user.value.uid, postData, "portfolios", "portfolio");
-
-    const log = {
-      date: new Date(),
-      log: 'ポートフォリオが申請されました。',
-      memberID: user.value.uid,
-      portfolioID: secondDocID
+    const secondDocID = await addData(otherValues, uploadResult);
+    if (otherValues.state === 'request') {
+      await recordLog(user.value.uid, secondDocID, 'ポートフォリオが申請されました');
     }
 
-    await addOneLevelData("logs", log);
+    handleReset();
 
-    message.value = 'ポートフォリオの申請に成功しました。';
+    router.push(`/admin/portfolio/${secondDocID}`);
 
   } catch (error) {
-    console.error(error);
-    errorMessage.value = 'ポートフォリオの申請に失敗しました。';
+    console.error('更新エラー', error);
+    errorMessage.value = '更新に失敗しました。';
   }
-};
+});
 
+// フォームデータの登録
+const addData = async (values, uploadResult) => {
+  const formattedInputData = formatFormValues(values);
+  // 1つでもvalueが空白であるかどうかをチェック
+  const isEmpty = Object.values(formattedInputData).some(value => !value) || !uploadResult;
+  if (isEmpty) {
+    // 1つでも空白があれば'request:no'を追加
+    formattedInputData.requestReady = false;
+  } else {
+    formattedInputData.requestReady = true;
+  }
+  const saveData = { ...formattedInputData, createDateTimestamp: new Date() };
+  if (uploadResult) {
+    saveData.portfolioImage = uploadResult;
+  }
+  const secondDocID = await addTwoLevelSingleData(user.value.uid, saveData, "portfolios", "portfolio");
+  return secondDocID;
+}
+
+// 画像処理
+const handleFileData = (file) => {
+  if (file) {
+    portfolioImage.value.value = file;
+  } else {
+    errorMessage.value = "アップロードするファイルがありません。";
+  }
+}
+const handleDeleteFileData = () => {
+  portfolioImage.value.value = [];
+}
 
 </script>
+<style>
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 64px;
+}
+</style>

@@ -98,14 +98,14 @@ onMounted(async () => {
 });
 
 // firebase
-import { updateOneLevelData } from '@/firebase/v1/firestore';
+import { updateOneLevelSingleData } from '@/firebase/v1/firestore';
 
 // 送信処理
 const submit = handleSubmit(async (values) => {
   try {
     // console.log(values);
     // ユーザー情報を更新
-    await updateOneLevelData(props.authUID, "members", values);
+    await updateOneLevelSingleData(props.authUID, "members", values);
     message.value = 'ユーザー情報の更新に成功しました。';
   } catch (error) {
     console.error('ユーザーデータ更新エラー', error);

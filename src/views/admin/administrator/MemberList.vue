@@ -1,27 +1,23 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" md="12">
-        <v-data-table
-          v-model:items-per-page="itemsPerPage"
-          v-model:expanded="expanded"
-          :headers="headers"
-          :items="filteredMembers"
-          :loading="loadingMembers"
-          show-expand
-        >
-          <template v-slot:expanded-row="{ columns, item }">
-            <tr>
-              <td class="bg-grey-lighten-5" :colspan="columns.length">
-                <!-- <pre>{{ item.raw.url }}</pre> -->
-                <a :href="item.url" class="text-decoration-underline">
-                  <v-icon> mdi-account-edit </v-icon>
-                  ユーザー詳細
-                </a>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
+      <v-col cols="12">
+        <v-sheet class="pa-2" rounded>
+          <v-data-table
+            v-model:items-per-page="itemsPerPage"
+            :headers="headers"
+            :items="members"
+            :loading="loading"
+          >
+            <template v-slot:item.name="{ item }">
+              <v-btn
+                variant="text"
+                color="primary"
+                @click="moveNextPage(item.id)"
+              >{{ item.name }}</v-btn>
+            </template>
+          </v-data-table>
+        </v-sheet>
       </v-col>
     </v-row>
   </v-container>
@@ -29,26 +25,25 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-const initialMembers = ref([]);
-const filteredMembers = ref([]);
-const expanded = ref([]);
-
-const loadingMembers = ref(true);
+const members = ref([]);
+const loading = ref(true);
 const itemsPerPage = 20;
 const headers = [
-  {
-    title: '事業所名',
-    align: 'start',
-    sortable: false, // ソート
-    key: 'officeName',
-  },
+  { title: '事業所名', align: 'start', key: 'officeName' },
   { title: '代表者名', align: 'start', key: 'name' },
   { title: '地方', align: 'start', key: 'eightArea' },
   { title: '都道府県', align: 'start', key: 'state' },
   { title: '入会年月日', align: 'start', key: 'joinDate' },
-  { title: '専門デザイン分野', align: 'start', key: 'specialty' },
-  // { title: 'URL', align: 'start', key: 'url' },
+  { title: 'メールアドレス', align: 'start', key: 'email' },
+  { title: '権限', align: 'start', key: 'role' },
 ];
+
+// router
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const moveNextPage = (id) => {
+  router.push(`/admin/profile/${id}`);
+}
 
 // firebase
 import { getOneLevelAllData } from '@/firebase/v1/firestore';
@@ -57,24 +52,22 @@ onMounted(async () => {
   try {
     const allDoc = await getOneLevelAllData("members");
 
-    initialMembers.value = allDoc.map((doc) => ({
-      url: `/admin/profile/${doc.memberID}`,
+    members.value = allDoc.map((doc) => ({
+      id: doc.memberID,
       officeName: doc.officeName,
       name: doc.name,
       eightArea: doc.eightArea,
       state: doc.state,
-      joinDate: doc.joinDate, // フォーマット不要ならそのまま
-      specialty: doc.specialty,
+      joinDate: doc.joinDate,
+      email: doc.email,
+      role: doc.role,
     }));
 
-    // 初期データを filteredMembers にスプレッド構文でコピーを作成
-    filteredMembers.value = [...initialMembers.value];
-
-    loadingMembers.value = false;
+    loading.value = false;
 
   } catch (error) {
     console.error('ユーザーデータ取得エラー', error);
-    loadingMembers.value = false;
+    loading.value = false;
   }
 });
 

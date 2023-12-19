@@ -47,7 +47,7 @@ import SignUpForm from '@/views/site/child_signup/SignUpForm.vue';
 
 // firebase
 import { signUp } from '@/firebase/v1/auth';
-import { setOneLevelData } from '@/firebase/v1/firestore';
+import { setOneLevelSingleData } from '@/firebase/v1/firestore';
 
 // utils
 import { formatFormValues } from '@/utils/formatData';
@@ -106,7 +106,7 @@ const submit = handleSubmit(async (values) => {
       ["checkbox", "password"].forEach(key => delete formattedInputData[key]); // 登録したくない物を削除
 
       const userData = { ...formattedInputData, ...otherData };
-      await setOneLevelData(user.uid, "members", userData);
+      await setOneLevelSingleData(user.uid, "members", userData);
 
       router.push({ name: 'Admin' });
     }

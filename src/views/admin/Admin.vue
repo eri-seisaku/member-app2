@@ -47,7 +47,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 const navMenus = ref([]);
-const user = ref('');
+const user = ref({});
 const userData = ref({});
 const logs = ref([]);
 
@@ -56,7 +56,7 @@ import HoverIconCard  from '@/components/cards/HoverIconCard.vue';
 
 // firebase
 import { getCurrentUser } from '@/firebase/v1/auth';
-import { getOneLevelData, getOneLevelAllData } from '@/firebase/v1/firestore';
+import { getOneLevelSingleData, getOneLevelAllData } from '@/firebase/v1/firestore';
 
 // utils
 import { formatDateForTimestamp } from '@/utils/formatData'; // 日付形式変換
@@ -69,7 +69,7 @@ import { getMenu } from '@/router/menu';
 onMounted(async () => {
   try {
     user.value = await getCurrentUser(); // auth情報
-    userData.value = await getOneLevelData(user.value.uid, "members"); // db内のuser情報
+    userData.value = await getOneLevelSingleData(user.value.uid, "members"); // db内のuser情報
     navMenus.value = getMenu(user.value, userData.value.role);
 
     const allDoc = await getOneLevelAllData("logs");

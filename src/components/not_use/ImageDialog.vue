@@ -10,7 +10,7 @@
             <DropFileInput
               @fileImport="handleFilesImport"
               @update:errorMessage="handleError"
-              type="circle"
+              type="avatar"
             ><template v-slot:action>
               <v-btn
                 class="mx-8"
@@ -52,7 +52,7 @@ import Alert from '@/components/Alert.vue';
 
 // firebase
 import { upload } from '@/firebase/v1/storage';
-import { updateOneLevelData } from '@/firebase/v1/firestore';
+import { updateOneLevelSingleData } from '@/firebase/v1/firestore';
 
 // ファイルがアップロードされたら
 const handleFilesImport = (uploadedFiles) => {
@@ -81,7 +81,7 @@ const submit = async () => {
       profileIcon: url
     };
 
-    await updateOneLevelData(props.authData.uid, "members", userData);
+    await updateOneLevelSingleData(props.authData.uid, "members", userData);
 
     emit('profileIconUrl', url);
 
