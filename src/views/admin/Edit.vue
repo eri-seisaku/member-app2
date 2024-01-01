@@ -1,13 +1,39 @@
 <template>
   <v-container>
     <v-row>
+      <v-col cols="12" md="6">
+        <v-btn
+          class="bg-white"
+          variant="outlined"
+          href='/admin/post'
+        >
+          新規追加
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row v-if="message || errorMessage">
+      <v-col cols="12" md="6">
+        <Alert
+            v-if="message"
+            color="primary"
+            :text="message"
+          />
+          <Alert
+            v-if="errorMessage"
+            color="red"
+            :text="errorMessage"
+          />
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col cols="12" md="8">
         <v-sheet class="pa-2 pa-sm-3 pa-md-6" rounded>
           <form @submit.prevent="submit" id="postForm" v-if="isReady">
             <NormalLabel label="ポートフォリオ画像" />
             <DropFileInput
               :schema="portfolioSchema.fields.portfolioImage"
-              :fileData="portfolioImage.value.value ? portfolioImage.value.value : ''"
+              :filePath="storagePath.value.value ? storagePath.value.value : ''"
+              :fileData="portfolioImage.value.value ? portfolioImage.value.value : {}"
               v-model:error="portfolioImage.errorMessage.value"
               @update:fileData="handleFileData"
               @update:deleteFileData="handleDeleteFileData"
@@ -67,9 +93,11 @@ import { ref, onMounted } from "vue";
 const user = ref({});
 const portfolioData = ref({});
 const isReady = ref(false);
+const message = ref('');
 const errorMessage = ref('');
 
 // components
+import Alert from '@/components/Alert.vue';
 import DropFileInput from '@/components/inputs/DropFileInput.vue';
 import NormalLabel from '@/components/inputs/helpers/NormalLabel.vue';
 import TextField from '@/components/inputs/TextField.vue';
@@ -88,6 +116,7 @@ const title = useField('title');
 const portfolioURL = useField('portfolioURL');
 const comment = useField('comment');
 const genre = useField('genre');
+const storagePath = useField('storagePath');
 const portfolioImage = useField('portfolioImage');
 
 // route
@@ -103,15 +132,17 @@ onMounted(async() => {
   try {
     user.value = await getCurrentUser();
     if (route.params.portfolioID) {
-      portfolioData.value = await getTwoLevelSingleData(user.value.uid, route.params.portfolioID, "portfolios", "portfolio");
+      portfolioData.value = await getTwoLevelSingleData(user.value.uid, route.params.portfolioID, "members", "portfolios");
     }
     if (portfolioData.value) {
       state.value.value = portfolioData.value.state;
       title.value.value = portfolioData.value.title;
       comment.value.value = portfolioData.value.comment;
       genre.value.value = portfolioData.value.genre;
+      storagePath.value.value = portfolioData.value.storagePath;
       portfolioURL.value.value = portfolioData.value.portfolioURL;
       portfolioImage.value.value = portfolioData.value.portfolioImage;
+      
     }
     isReady.value = true;
   } catch (error) {
@@ -123,16 +154,21 @@ onMounted(async() => {
 // 送信処理
 const submit = handleSubmit(async (values) => {
   const { portfolioImage, ...otherValues } = values;
-  let uploadResult;
+  let url;
+  let fileInfo;
   try {
     if (portfolioImage !== undefined) {
-      uploadResult = await upload("portfolio", portfolioImage, user.value.uid);
+      [url, fileInfo] = await upload("portfolio", portfolioImage, user.value.uid);
     }
 
-    await updateData(otherValues, uploadResult);
+    otherValues.storagePath = url;
+
+    await updateData(otherValues, fileInfo);
+
     if (otherValues.state === 'request') {
       await recordLog(user.value.uid, route.params.portfolioID, 'ポートフォリオが申請されました');
     }
+    message.value = '変更内容を保存しました。';
 
   } catch (error) {
     console.error('更新エラー', error);
@@ -141,17 +177,17 @@ const submit = handleSubmit(async (values) => {
 });
 
 // フォームデータの登録
-const updateData = async (values, uploadResult) => {
-  const isEmpty = Object.values(values).some(value => !value) || !uploadResult;
+const updateData = async (values, fileInfo) => {
+  const isEmpty = Object.values(values).some(value => !value) || !fileInfo;
   if (isEmpty) {
     values.requestReady = false;
   } else {
     values.requestReady = true;
   }
-  if (uploadResult) {
-    values.portfolioImage = uploadResult;
+  if (fileInfo) {
+    values.portfolioImage = fileInfo;
   }
-  await updateTwoLevelSingleData(user.value.uid, "portfolios", "portfolio", route.params.portfolioID, values);
+  await updateTwoLevelSingleData(user.value.uid, "members", "portfolios", route.params.portfolioID, values);
 }
 
 // 画像処理
@@ -164,6 +200,7 @@ const handleFileData = (file) => {
 }
 const handleDeleteFileData = () => {
   portfolioImage.value.value = [];
+  storagePath.value.value = '';
 }
 
 </script>

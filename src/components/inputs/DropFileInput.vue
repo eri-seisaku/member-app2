@@ -46,7 +46,7 @@
           color="primary"
           variant="text"
         >
-        キャンセル
+          キャンセル
         </v-btn>
         <slot name="action"></slot>
       </v-col>
@@ -68,13 +68,14 @@ const props = defineProps({
   type: String,
   schema: Object,
   error: String,
-  fileData: Object
+  filePath: String,
+  fileData: Object,
 });
 
 
-if (props.fileData) {
+if (props.fileData && props.filePath) {
   fileData.value = props.fileData;
-  previewURL.value = props.fileData.url;
+  previewURL.value = props.filePath;
   uploadMode.value = false;
 }
 
@@ -144,7 +145,7 @@ const addFile = (file) => {
 // ファイル削除
 const deleteFile = () => {
   fileData.value = [];
-  previewURL.value = props.filePath ? props.filePath : '';
+  previewURL.value = '';
   emit('update:deleteFileData');
   uploadMode.value = true;
 }

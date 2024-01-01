@@ -34,10 +34,10 @@
         </v-btn>
         <v-btn
           @click="submit"
-          variant="outlined"
+          color="primary"
+          variant="flat"
           size="large"
           min-width="100"
-          class="bg-primary"
         >
           送信
         </v-btn>

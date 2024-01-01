@@ -18,5 +18,7 @@ export const industries = [
 export const role = {
   member: '会員',
   fullMember: '正会員',
-  administrator: '管理者'
+  administrator: '管理者',
+  cancellationApplicant: '退会申請者',
+  cancellation: '退会者',
 };

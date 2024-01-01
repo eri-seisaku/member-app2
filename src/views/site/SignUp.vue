@@ -13,7 +13,7 @@
       </div>
       <!-- 共通 -->
       <v-row align-content="center">
-        <v-col cols="12" v-if="!confirmMode" align="center">
+        <v-col cols="12" v-if="!confirmMode" align="center" class="my-4">
           <v-btn
             type="submit"
             variant="outlined"
@@ -48,6 +48,9 @@ import SignUpForm from '@/views/site/child_signup/SignUpForm.vue';
 // firebase
 import { signUp } from '@/firebase/v1/auth';
 import { setOneLevelSingleData } from '@/firebase/v1/firestore';
+
+// functions
+import { sendMail } from "@/firebase/firebase";
 
 // utils
 import { formatFormValues } from '@/utils/formatData';
@@ -107,6 +110,14 @@ const submit = handleSubmit(async (values) => {
 
       const userData = { ...formattedInputData, ...otherData };
       await setOneLevelSingleData(user.uid, "members", userData);
+
+      // メール送信
+      const sendData = {
+        name: values.name,
+        email: values.email,
+        content: '会員申込'
+      };
+      await sendMail(sendData);
 
       router.push({ name: 'Admin' });
     }

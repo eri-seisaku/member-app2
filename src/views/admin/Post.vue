@@ -1,5 +1,19 @@
 <template>
   <v-container>
+    <v-row v-if="message || errorMessage">
+      <v-col cols="12" md="6">
+        <Alert
+            v-if="message"
+            color="primary"
+            :text="message"
+          />
+          <Alert
+            v-if="errorMessage"
+            color="red"
+            :text="errorMessage"
+          />
+      </v-col>
+    </v-row>
     <v-row>
       <v-col cols="12" md="8">
         <v-sheet class="pa-2 pa-sm-3 pa-md-6" rounded>
@@ -22,13 +36,13 @@
             <NormalLabel label="分野" />
             <TextArea
               :field="genre"
-              hint="最大50文字まで"
+              hint="最大100文字まで"
               :rows="2"
             />
             <NormalLabel label="コメント" />
             <TextArea
               :field="comment"
-              hint="最大200文字まで"
+              hint="最大500文字まで"
               :rows="4"
             />
           </form>
@@ -64,9 +78,11 @@
 <script setup>
 import { ref, onMounted } from "vue";
 const user = ref({});
+const message = ref('');
 const errorMessage = ref('');
 
 // components
+import Alert from '@/components/Alert.vue';
 import DropFileInput from '@/components/inputs/DropFileInput.vue';
 import NormalLabel from '@/components/inputs/helpers/NormalLabel.vue';
 import TextField from '@/components/inputs/TextField.vue';
@@ -85,6 +101,7 @@ const title = useField('title');
 const portfolioURL = useField('portfolioURL');
 const comment = useField('comment');
 const genre = useField('genre');
+const storagePath = useField('storagePath');
 const portfolioImage = useField('portfolioImage');
 
 // checkboxの初期値
@@ -99,7 +116,11 @@ state.value.value = 'save';
 // firebase
 import { upload } from '@/firebase/v1/storage';
 import { getCurrentUser } from '@/firebase/v1/auth';
-import { addTwoLevelSingleData, recordLog } from '@/firebase/v1/firestore';
+import {
+  addTwoLevelSingleData,
+  addElementToArray,
+  recordLog
+} from '@/firebase/v1/firestore';
 // utils
 import { formatFormValues } from '@/utils/formatData';
 
@@ -119,18 +140,20 @@ onMounted(async() => {
 // 送信処理
 const submit = handleSubmit(async (values) => {
   const { portfolioImage, ...otherValues } = values;
-  let uploadResult
-  // let uploadResult = {
-  //   name: '',
-  //   type: '',
-  //   url: ''
-  // };
+  let url;
+  let fileInfo;
   try {
     if (portfolioImage !== undefined) {
-      uploadResult = await upload("portfolio", portfolioImage, user.value.uid);
+      [url, fileInfo] = await upload("portfolio", portfolioImage, user.value.uid);
     }
 
-    const secondDocID = await addData(otherValues, uploadResult);
+    otherValues.storagePath = url;
+
+    const secondDocID = await addData(otherValues, fileInfo);
+
+    // セカンドDocIDをフィールドに保存する
+    await addElementToArray("members", user.value.uid, "portfolioIDs", secondDocID);
+
     if (otherValues.state === 'request') {
       await recordLog(user.value.uid, secondDocID, 'ポートフォリオが申請されました');
     }
@@ -146,21 +169,21 @@ const submit = handleSubmit(async (values) => {
 });
 
 // フォームデータの登録
-const addData = async (values, uploadResult) => {
+const addData = async (values, fileInfo) => {
   const formattedInputData = formatFormValues(values);
   // 1つでもvalueが空白であるかどうかをチェック
-  const isEmpty = Object.values(formattedInputData).some(value => !value) || !uploadResult;
+  const isEmpty = Object.values(formattedInputData).some(value => !value) || !fileInfo;
   if (isEmpty) {
-    // 1つでも空白があれば'request:no'を追加
+    // 1つでも空白があれば申請できないようにする
     formattedInputData.requestReady = false;
   } else {
     formattedInputData.requestReady = true;
   }
   const saveData = { ...formattedInputData, createDateTimestamp: new Date() };
-  if (uploadResult) {
-    saveData.portfolioImage = uploadResult;
+  if (fileInfo) {
+    saveData.portfolioImage = fileInfo;
   }
-  const secondDocID = await addTwoLevelSingleData(user.value.uid, saveData, "portfolios", "portfolio");
+  const secondDocID = await addTwoLevelSingleData(user.value.uid, saveData, "members", "portfolios");
   return secondDocID;
 }
 

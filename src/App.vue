@@ -7,6 +7,9 @@
 </script>
 <style>
 /* 初期設定 */
+html {
+  scroll-padding-top: 64px; /* ヘッダーの高さ */
+}
 ul {
   list-style: none;
 }

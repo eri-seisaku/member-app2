@@ -46,7 +46,6 @@
       </v-list>
     </v-navigation-drawer>
 
-
     <v-main class="bg-grey-lighten-3">
       <v-container>
         <v-row>
@@ -109,17 +108,14 @@ const navMenus = [
     to: '/'
   },
   {
-    title: 'CHECK',
-    to: '/check'
+    title: 'INFO',
+    to: '/info'
   },
   {
     title: 'LIST',
     to: '/list'
   },
 ];
-
-// components
-import HoverImgCard from '@/components/cards/HoverImgCard.vue';
 
 </script>
 

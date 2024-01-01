@@ -1,8 +1,6 @@
 <template>
-  <v-row class="custom-color justify-center">
-    <!-- align-self="center"をつけると高さがそろわない -->
-    <!-- <v-col cols="12" md="3" align-self="center"> -->
-    <v-col cols="12" md="3">
+  <v-row>
+    <v-col cols="12" md="3" align-self="center">
       <RequiredLabel label="種別" />
     </v-col>
     <v-col cols="12" md="8">
@@ -17,11 +15,11 @@
     </v-col>
   </v-row>
   <!-- textFields -->
-  <v-row v-for="fieldInfo in textFields" :key="fieldInfo.key" class="custom-color justify-center">
-    <v-col cols="12" md="3" v-if="fieldInfo.type !== 'optional'">
+  <v-row v-for="fieldInfo in textFields" :key="fieldInfo.key">
+    <v-col cols="12" md="3" align-self="center" v-if="fieldInfo.type !== 'optional'">
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
-    <v-col cols="12" md="3" v-else>
+    <v-col cols="12" md="3" align-self="center" v-else>
       <OptionalLabel :label="fieldInfo.label" />
     </v-col>
     <v-col cols="12" md="8" class="d-flex align-center">
@@ -37,8 +35,8 @@
   </v-row>
   <!-- /textFields -->
   <!-- dateFields -->
-  <v-row v-for="fieldInfo in dateFields" :key="fieldInfo.key" class="custom-color justify-center">
-    <v-col cols="12" md="3">
+  <v-row v-for="fieldInfo in dateFields" :key="fieldInfo.key">
+    <v-col cols="12" md="3" align-self="center" >
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
     <v-col cols="12" md="8" class="d-flex align-center">
@@ -52,8 +50,8 @@
   </v-row>
   <!-- /dateFields -->
   <!-- password -->
-  <v-row class="custom-color justify-center">
-    <v-col cols="12" md="3">
+  <v-row >
+    <v-col cols="12" md="3" align-self="center" class="mb-md-15 mb-2">
       <RequiredLabel label="パスワード" />
     </v-col>
     <v-col cols="12" md="8">
@@ -62,11 +60,11 @@
   </v-row>
   <!-- /password -->
   <!-- address -->
-  <v-row class="custom-color justify-center">
-    <v-col cols="12" md="3">
+  <v-row >
+    <v-col cols="12" md="3" align-self="center" >
       <RequiredLabel label="郵便番号" />
     </v-col>
-    <v-col cols="12" md="8" class="d-flex">
+    <v-col cols="12" md="5" class="d-flex">
       <TextField
         :field="zipCode"
         hint="ハイフンなし数字のみ"
@@ -74,7 +72,7 @@
       <v-btn
         variant="outlined"
         class="ml-6"
-        min-height="40"
+        size="large"
         :disabled="!!zipCode.errorMessage.value || !zipCode.value.value"
         @click="searchAddress"
       >
@@ -85,22 +83,22 @@
       <p class="text-red-lighten-1 text-subtitle-2">{{ message }}</p>
     </v-col>
   </v-row>
-  <v-row class="custom-color justify-center">
-    <v-col cols="12" md="3">
+  <v-row >
+    <v-col cols="12" md="3" align-self="center" >
       <RequiredLabel label="都道府県" />
     </v-col>
-    <v-col cols="12" md="8">
+    <v-col cols="12" md="5">
       <SelectField
         :field="state"
         :items="states"
       />
     </v-col>
   </v-row>
-  <v-row v-for="fieldInfo in addressFields" :key="fieldInfo.key" class="custom-color justify-center">
-    <v-col cols="12" md="3" v-if="fieldInfo.type !== 'optional'">
+  <v-row  v-for="fieldInfo in addressFields" :key="fieldInfo.key">
+    <v-col cols="12" md="3" align-self="center" v-if="fieldInfo.type !== 'optional'">
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
-    <v-col cols="12" md="3" v-else>
+    <v-col cols="12" md="3" align-self="center" v-else>
       <OptionalLabel :label="fieldInfo.label" />
     </v-col>
     <v-col cols="12" md="8">
@@ -113,11 +111,11 @@
   </v-row>
   <!-- /address -->
   <!-- category -->
-  <v-row v-for="fieldInfo in categoryFields" :key="fieldInfo.key" class="custom-color justify-center">
-    <v-col cols="12" md="3">
+  <v-row  v-for="fieldInfo in categoryFields" :key="fieldInfo.key">
+    <v-col cols="12" md="3" align-self="center" >
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
-    <v-col cols="12" md="8">
+    <v-col cols="12" md="5">
       <SelectField
         :field="fieldInfo.field"
         :items="fieldInfo.items"
@@ -126,11 +124,11 @@
   </v-row>
   <!-- /category -->
   <!-- checkbox -->
-  <v-row class="custom-color justify-center">
-    <v-col cols="12" md="3">
+  <v-row >
+    <v-col cols="12" md="3" align-self="center" >
       <RequiredLabel label="利用規約" />
     </v-col>
-    <v-col cols="12" md="8">
+    <v-col cols="12" md="9">
       <CheckBox
         :field="checkbox"
         value="1"
@@ -212,16 +210,5 @@ const searchAddress = async () => {
 
 </script>
 <style>
-.custom-color > div {
-  border: 2px solid white;
-}
-/* 1番目の子要素の色 */
-.custom-color > div:first-child {
-  background-color: #E0E0E0;
-}
 
-/* 2番目の子要素の色 */
-.custom-color > div:nth-child(2) {
-  background-color: #F5F5F5;
-}
 </style>

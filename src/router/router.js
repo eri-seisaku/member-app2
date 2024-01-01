@@ -25,10 +25,21 @@ const siteRoutes = [
         meta: { title: 'HOME'}
       },
       {
+        path: '/info',
+        name: 'Info',
+        component: () => import('@/views/site/Info.vue'),
+        meta: { title: 'INFO'}
+      },
+      {
         path: '/check',
         name: 'Check',
         component: () => import('@/views/site/Check.vue'),
-        meta: { title: 'CHECK'}
+        meta: { title: 'CHECK'},
+        beforeEnter: (to, from) => {
+          if (from === START_LOCATION) {
+            return '/info'
+          }
+        },
       },
       {
         path: '/signup',
@@ -37,7 +48,7 @@ const siteRoutes = [
         meta: { title: 'SIGNUP'},
         beforeEnter: (to, from) => {
           if (from === START_LOCATION) {
-            return '/check'
+            return '/info'
           }
         },
       },
@@ -46,6 +57,12 @@ const siteRoutes = [
         name: 'List',
         component: () => import('@/views/site/List.vue'),
         meta: { title: 'LIST'}
+      },
+      {
+        path: '/send',
+        name: 'Send',
+        component: () => import('@/views/site/Send.vue'),
+        meta: { title: 'SEND'}
       },
       {
         path: '/members/:userID',
@@ -110,12 +127,6 @@ const adminRoutes = [
         name: 'Test',
         component: () => import('@/views/admin/Test.vue'),
         meta: { title: 'TEST'}
-      },
-      {
-        path: '/admin/sample-post',
-        name: 'SamplePost',
-        component: () => import('@/views/admin/SamplePost.vue'),
-        meta: { title: 'SamplePost'}
       },
     ],
   },

@@ -34,12 +34,7 @@
     <!-- /エラーメッセージ -->
     <v-row v-if="fileData && previewURL">
       <v-col cols="12" class="text-center">
-        <Avatar
-          v-if="props.type === 'avatar'" :imageSrc="previewURL"
-          :size="150"
-        />
         <v-img
-          v-else
           max-height="200"
           :src="previewURL"
         />
@@ -51,7 +46,7 @@
           color="primary"
           variant="text"
         >
-        キャンセル
+          キャンセル
         </v-btn>
         <slot name="action"></slot>
       </v-col>
@@ -73,15 +68,19 @@ const props = defineProps({
   type: String,
   schema: Object,
   error: String,
-  filePath: String,
+  fileData: [Object, String]
 });
+
+
+if (props.fileData) {
+  fileData.value = props.fileData;
+  previewURL.value = props.fileData.url;
+  uploadMode.value = false;
+}
 
 watch(() => props.error, (newVal) => {
   errorMessage.value = newVal;
 });
-
-// component
-import Avatar from '@/components/Avatar.vue';
 
 // 子から親へ
 const emit = defineEmits([
@@ -100,7 +99,7 @@ const handleFileInput = (e) => {
 // ドロップでアプロード
 const dropFile = (e) => {
   dragover.value = false; // 枠線の色変更
-  console.log(e.dataTransfer.files.length)
+  // console.log(e.dataTransfer.files.length)
   if (e.dataTransfer.files.length === 1) {
     targetFile.value = e.dataTransfer.files;
     handleFileUpload(targetFile.value[0]);
@@ -132,7 +131,6 @@ const validateImage = (file) => {
 
 // プレビューURLの生成
 const setPreviewURL = (file) => {
-  console.log(file);
   previewURL.value = URL.createObjectURL(file);
 }
 

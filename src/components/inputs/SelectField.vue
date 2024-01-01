@@ -2,6 +2,7 @@
   <v-select
     variant="outlined"
     density="compact"
+    bg-color="white"
     label="選択してください"
     :items="items"
     v-model="parentField.value.value"

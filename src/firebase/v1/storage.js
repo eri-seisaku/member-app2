@@ -25,11 +25,7 @@ export async function upload(directoryName, fileData, userID) {
     const meta = await getMetadata(snapshot.ref);
     // console.log(meta.contentType); // ファイルタイプを表示
 
-    return {
-      url: url,
-      name: fileData.name,
-      type: meta.contentType,
-    };
+    return [url, {name: fileData.name, type: meta.contentType}];
 
   } catch (error) {
     console.error("Storageへのデータ保存エラーby Storage:", error);

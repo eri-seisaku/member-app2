@@ -3,11 +3,11 @@ import {
   createUserWithEmailAndPassword, // 新規登録
   signInWithEmailAndPassword, // ログイン
   signOut, // ログアウト
-  EmailAuthProvider, // 再認証に必要?
-  reauthenticateWithCredential, // 再認証
-  verifyBeforeUpdateEmail, // email更新
+  EmailAuthProvider, // 認証情報（credential）を作成する為に必要
+  reauthenticateWithCredential, // 再認証を行う関数
+  verifyBeforeUpdateEmail, // メールアドレス更新する関数
   // updateEmail, // email更新 // 廃止？
-  updatePassword, // password更新
+  updatePassword, // パスワードを更新する関数
   sendEmailVerification, // メールアドレス変更後確認メール送信
   sendPasswordResetEmail, // パスワードの再設定メール送信
   fetchSignInMethodsForEmail // 重複確認

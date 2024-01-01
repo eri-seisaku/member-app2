@@ -27,6 +27,13 @@
           >職務経歴</v-tab>
 
           <v-tab
+            value="exclusive"
+            class="custom-tab"
+            hide-slider
+            selected-class="bg-white"
+          >会員専用</v-tab>
+
+          <v-tab
             value="account"
             class="custom-tab"
             hide-slider
@@ -48,6 +55,14 @@
 
             <v-window-item value="resume">
               <Resume
+                v-if="isReady"
+                :authUID="userID"
+                :dbData="userDoc"
+              />
+            </v-window-item>
+
+            <v-window-item value="exclusive">
+              <Exclusive
                 v-if="isReady"
                 :authUID="userID"
                 :dbData="userDoc"
@@ -81,6 +96,7 @@ const isReady = ref(false);
 import Alert from '@/components/Alert.vue';
 import ProfileInfo from '@/views/admin/child_profile/ProfileInfo.vue';
 import Resume from '@/views/admin/child_profile/Resume.vue';
+import Exclusive from '@/views/admin/child_profile/Exclusive.vue';
 import Account from '@/views/admin/child_profile/Account.vue';
 
 // route
@@ -90,7 +106,6 @@ const route = useRoute();
 // firebase
 import { getCurrentUser } from '@/firebase/v1/auth';
 import { getOneLevelSingleData } from '@/firebase/v1/firestore';
-
 
 onMounted(async () => {
   try {

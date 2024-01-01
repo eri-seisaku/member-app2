@@ -7,6 +7,7 @@
     persistent-hint
     persistent-counter
     counter
+    bg-color="white"
     variant="outlined"
     auto-grow
   ></v-textarea>

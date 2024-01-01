@@ -2,6 +2,7 @@
   <v-text-field
     density="compact"
     variant="outlined"
+    bg-color="white"
     v-model="parentField.value.value"
     :error-messages="parentField.errorMessage.value"
     persistent-hint

@@ -112,10 +112,10 @@
                 @click="moveNextPage(item.id)"
               >{{ truncateTitle(item.title) }}</v-btn>
             </template>
-            <template v-slot:item.portfolioImage="{ item }">
+            <template v-slot:item.storagePath="{ item }">
               <v-img
                 :width="100"
-                :src="item.portfolioImage"
+                :src="item.storagePath"
                 class="pa-6"
               ></v-img>
             </template>
@@ -147,7 +147,7 @@ const headers = [
   { title: '状態', align: 'start', key: 'state' },
   { title: 'タイトル', align: 'start', key: 'title' },
   { title: '日付', align: 'start', key: 'createDateTimestamp' },
-  { title: '画像', align: 'start', key: 'portfolioImage' },
+  { title: '画像', align: 'start', key: 'storagePath' },
 ];
 // 選択されたIDを確認
 watch(() => selected.value, (newVal) => {
@@ -179,14 +179,21 @@ import Alert from '@/components/Alert.vue';
 
 // firebase
 import { getCurrentUser } from '@/firebase/v1/auth';
-import { getTwoLevelUserData, deleteTwoLevelData, updateTwoLevelMultipleData, recordLog } from '@/firebase/v1/firestore';
+import {
+  getTwoLevelUserData,
+  deleteTwoLevelData,
+  updateTwoLevelMultipleData,
+  removeElementFromArray,
+  recordLog,
+} from '@/firebase/v1/firestore';
 
 // utils
 import { formatDateForTimestamp } from '@/utils/formatData'; // 日付形式変換
 
 // router
 import { useRouter } from 'vue-router';
-const router = useRouter(); // ルーターインスタンスを取得
+const router = useRouter();
+
 const moveNextPage = (id) => {
   router.push(`/admin/portfolio/${id}`);
 }
@@ -195,7 +202,7 @@ const moveNextPage = (id) => {
 onMounted(async () => {
   try {
     user.value = await getCurrentUser();
-    const allDoc = await getTwoLevelUserData(user.value.uid, 'portfolios', 'portfolio');
+    const allDoc = await getTwoLevelUserData(user.value.uid, 'members', 'portfolios');
 
     portfolios.value = allDoc.map((doc) => ({
       id: doc.id,
@@ -203,8 +210,9 @@ onMounted(async () => {
       genre: doc.genre,
       comment: doc.comment,
       state: doc.state,
+      storagePath: doc.storagePath,
       portfolioURL: doc.portfolioURL,
-      portfolioImage: doc.portfolioImage ? doc.portfolioImage.url : null,
+      portfolioImage: doc.portfolioImage,
       createDateTimestamp: formatDateForTimestamp(doc.createDateTimestamp),
       requestReady: doc.requestReady
     }));
@@ -220,11 +228,17 @@ onMounted(async () => {
 
 // 選択したアイテムを送信
 const submit = async () => {
+  console.log(selected.value)
   if (selected.value.length && selectedAction.value) {
 
     if (selectedAction.value.value === "delete") {
-      await deleteTwoLevelData(user.value.uid, "portfolios", "portfolio", selected.value)
+      await deleteTwoLevelData(user.value.uid, "members", "portfolios", selected.value)
+
+      // portfolioIDsも削除
+      await removeElementFromArray('members', user.value.uid, 'portfolioIDs', selected.value)
+
       message.value = "削除しました。";
+
       // 削除したアイテムをローカルの状態から手動で削除
       portfolios.value = portfolios.value.filter(item => !selected.value.includes(item.id));
 
@@ -232,7 +246,7 @@ const submit = async () => {
       const arrayData = {
         state: "request"
       };
-      await updateTwoLevelMultipleData(user.value.uid, "portfolios", "portfolio", selected.value, arrayData)
+      await updateTwoLevelMultipleData(user.value.uid, "members", "portfolios", selected.value, arrayData)
 
       await recordLog(user.value.uid, selected.value, 'ポートフォリオが申請されました');
       message.value = "申請しました。";

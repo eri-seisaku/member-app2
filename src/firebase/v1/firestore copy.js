@@ -213,7 +213,37 @@ export async function getOneLevelAllData(collectionName) {
 }
 
 // 取得 - 全 - 2階層
+export async function getTwoLevelAllData(firstCollectionName, secondCollectionName) {
+  try {
+    const firstCollectionRef = collection(db, firstCollectionName);
 
+    const firstSnapshot = await getDocs(firstCollectionRef);
+    const allData = [];
+
+    // デバック
+    // firstSnapshot.forEach((doc) => {
+    //   console.log(doc.id);
+    // });
+
+    // const userIds = firstSnapshot.docs.map(doc => doc.id);
+    // console.log(userIds);  // ユーザーIDの配列を表示
+
+    for (const userDoc of firstSnapshot.docs) {
+      const userID = userDoc.id;
+      const secondCollectionRef = collection(userDoc.ref, secondCollectionName);
+      const secondSnapshot = await getDocs(secondCollectionRef);
+
+      secondSnapshot.forEach((postDoc) => {
+        allData.push({ userID, postID: postDoc.id, ...postDoc.data() });
+      });
+    }
+
+    return allData;
+  } catch (error) {
+    console.error('取得エラーby Firestore:', error);
+    throw error;
+  }
+}
 
 // ログに記録
 export async function recordLog(userID, docID, logMassage) {

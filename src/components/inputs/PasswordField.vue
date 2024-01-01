@@ -2,6 +2,7 @@
   <v-text-field
     density="compact"
     variant="outlined"
+    bg-color="white"
     v-model="parentField.value.value"
     :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
     :type="visible ? 'text' : 'password'"

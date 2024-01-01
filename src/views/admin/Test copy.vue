@@ -7,17 +7,11 @@
           <v-row>
             <v-col cols="12">
               <NormalLabel label="画像" />
-              <!-- <DropFileInput
-                :schema="portfolioSchemaV2.fields[`portfolioImage${index + 1}`]"
-                v-model:error="item.portfolioImage.errorMessage.value"
-                @update:fileData="handleFileData"
-                @update:deleteFileData="handleDeleteFileData"
-              /> -->
               <DropFileInput
                 :schema="portfolioSchemaV2.fields[`portfolioImage${index + 1}`]"
                 v-model:error="item.portfolioImage.errorMessage.value"
-                @update:fileData="file => handleFileData(file, item.portfolioImage)"
-                @update:deleteFileData="() => handleDeleteFileData(item.portfolioImage)"
+                @update:fileData="handleFileData(index)"
+                @update:deleteFileData="handleDeleteFileData"
               />
 
               <NormalLabel label="タイトル" />
@@ -85,6 +79,7 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 
 // components
 import NormalLabel from '@/components/inputs/helpers/NormalLabel.vue';
@@ -100,7 +95,6 @@ const { handleSubmit } = useForm({
   validationSchema: portfolioSchemaV2,
 });
 
-// useFieldと紐づけ
 const formItems = [];
 const fields = ['state', 'title', 'comment', 'state', 'genre', 'portfolioImage', 'portfolioURL'];
 
@@ -113,23 +107,23 @@ for (let i = 1; i <= 5; i++) {
   formItems.push(item);
 }
 
-// 画像処理
-const handleFileData = (file, field) => {
-  console.log(file)
-  if (file) {
-    field.value.value = file;
-  } else {
-    field.errorMessage.value = "アップロードするファイルがありません。";
-  }
-}
-const handleDeleteFileData = (field) => {
-  field.value.value = [];
-}
-
 // 送信処理
 const submit = handleSubmit(async (values) => {
   console.log(values);
 });
+
+// 画像処理
+const handleFileData = (file) => {
+  console.log(file)
+  if (file) {
+    portfolioImage.value.value = file;
+  } else {
+    errorMessage.value = "アップロードするファイルがありません。";
+  }
+}
+const handleDeleteFileData = () => {
+  portfolioImage.value.value = [];
+}
 
 </script>
 <style>

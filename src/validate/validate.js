@@ -181,6 +181,13 @@ export const authSchema = object({
   password: string().required(),
 });
 
+// プロフィール - 退会
+export const deleteSchema = object({
+  cancellationYear: string().required(), // 退会希望年
+  cancellationMonth: string().required(), // 退会希望年
+  cancellationReason: string(), // 退会理由
+});
+
 // プロフィール - 職務経歴更新
 export const resumeSchema = object({
   jobType: string().max(50, "50文字以下で入力してください"), // 職種
@@ -199,6 +206,7 @@ export const resumeSchema = object({
 // ポートフォリオ
 export const portfolioSchema = object({
   state: string(),
+  storagePath: string(),
   title: string().when('state', {
     is: (value) => value === 'request',
     then: () => string().required(),
@@ -211,13 +219,13 @@ export const portfolioSchema = object({
   }),
   genre: string().when('state', {
     is: (value) => value === 'request',
-    then: () => string().max(50, "50文字以下で入力してください").required(),
-    otherwise: () => string().max(50, "50文字以下で入力してください"),
+    then: () => string().max(100, "100文字以下で入力してください").required(),
+    otherwise: () => string().max(100, "100文字以下で入力してください"),
   }),
   comment: string().when('state', {
     is: (value) => value === 'request',
-    then: () => string().max(200, "200文字以下で入力してください").required(),
-    otherwise: () => string().max(200, "200文字以下で入力してください"),
+    then: () => string().max(500, "500文字以下で入力してください").required(),
+    otherwise: () => string().max(500, "500文字以下で入力してください"),
   }),
   portfolioImage: string().when('state', {
     is: (value) => value === 'request',
@@ -225,3 +233,45 @@ export const portfolioSchema = object({
     otherwise: () => imageTypeTest(),
   }),
 });
+
+// ポートフォリオv2
+const createPortfolioSchema = (index) => {
+  return {
+    [`state${index}`]: string(),
+    [`storagePath${index}`]: string(),
+    [`title${index}`]: string().when(`state${index}`, {
+      is: (value) => value === 'request',
+      then: () => string().required(),
+      otherwise: () => string(),
+    }),
+    [`portfolioURL${index}`]: string().when(`state${index}`, {
+      is: (value) => value === 'request',
+      then: () => string().url('有効なURLを入力してください').nullable().required(),
+      otherwise: () => string().url('有効なURLを入力してください').nullable(),
+    }),
+    [`genre${index}`]: string().when(`state${index}`, {
+      is: (value) => value === 'request',
+      then: () => string().max(100, "100文字以下で入力してください").required(),
+      otherwise: () => string().max(100, "100文字以下で入力してください"),
+    }),
+    [`comment${index}`]: string().when(`state${index}`, {
+      is: (value) => value === 'request',
+      then: () => string().max(500, "500文字以下で入力してください").required(),
+      otherwise: () => string().max(500, "500文字以下で入力してください"),
+    }),
+    [`portfolioImage${index}`]: string().when(`state${index}`, {
+      is: (value) => value === 'request',
+      then: () => imageTypeTest().required(),
+      otherwise: () => imageTypeTest(),
+    }),
+  };
+};
+
+export const portfolioSchemaV2 = object({
+  ...createPortfolioSchema(1),
+  ...createPortfolioSchema(2),
+  ...createPortfolioSchema(3),
+  ...createPortfolioSchema(4),
+  ...createPortfolioSchema(5),
+});
+

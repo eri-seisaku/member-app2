@@ -5,9 +5,10 @@
         <v-sheet class="pa-6" rounded>
           <h3 class="text-h5">エクスポート</h3>
           <v-divider class="my-4"></v-divider>
-            <SelectExport
+            <ExportButton @update:errorMessage="handleError" />
+            <!-- <SelectExport
               @update:errorMessage="handleError"
-            />
+            /> -->
         </v-sheet>
       </v-col>
       <v-col cols="12">
@@ -37,7 +38,8 @@ const message = ref('');
 const errorMessage = ref('');
 
 // components
-import SelectExport from '@/components/SelectExport.vue';
+// import SelectExport from '@/components/SelectExport.vue';
+import ExportButton from '@/components/buttons/ExportButton.vue';
 import SelectImport from '@/components/SelectImport.vue';
 import Alert from '@/components/Alert.vue';
 

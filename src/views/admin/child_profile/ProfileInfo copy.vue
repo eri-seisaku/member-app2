@@ -1,41 +1,43 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <form @submit.prevent="submit">
-        <v-row>
-          <v-col cols="12" md="6" v-for="editInfo in editData">
-            <NormalLabel :label="editInfo.label" />
-            <TextField
-              :field="editInfo.field"
-              :hint="editInfo.hint"
-            />
-          </v-col>
-          <v-col cols="12" md="6" v-for="readInfo in readData">
-            <NormalLabel :label="readInfo.label" />
-            <v-text-field
-              v-model="readInfo.value.value"
-              density="compact"
-              variant="outlined"
-              :disabled="true"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
-            <v-btn
-              variant="outlined"
-              type="submit"
-            >
-              保存
-            </v-btn>
-          </v-col>
-        </v-row>
-      </form>
-      <Alert
-        v-if="message || errorMessage"
-        :color="message ? 'primary' : 'red'"
-        :text="message ? message : errorMessage"
-      />
+      <v-sheet class="pa-6 mx-2" rounded>
+        <v-form @submit.prevent="submit">
+          <v-row>
+            <v-col cols="12" md="6" v-for="editInfo in editData">
+              <NormalLabel :label="editInfo.label" />
+              <TextField
+                :field="editInfo.field"
+                :hint="editInfo.hint"
+              />
+            </v-col>
+            <v-col cols="12" md="6" v-for="readInfo in readData">
+              <NormalLabel :label="readInfo.label" />
+              <v-text-field
+                v-model="readInfo.value.value"
+                density="compact"
+                variant="outlined"
+                :disabled="true"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-btn
+                variant="outlined"
+                type="submit"
+              >
+                保存
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+        <Alert
+          v-if="message || errorMessage"
+          :color="message ? 'primary' : 'red'"
+          :text="message ? message : errorMessage"
+        />
+      </v-sheet>
     </v-col>
   </v-row>
 </template>
