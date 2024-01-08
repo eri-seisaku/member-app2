@@ -50,7 +50,8 @@ export const getMenu = (user, userRole) => {
       {
         icon: 'mdi-file-account',
         title: 'PORTFOLIO',
-        to: '/admin/portfolio-list'
+        // to: '/admin/portfolio-list'
+        to: `/admin/portfolio-list/${user.uid}` // 変更
       },
       {
         to: '',

@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height" fluid>
-    <v-row>
-      <v-col>
+    <v-row justify="center">
+      <v-col cols="12" md="8">
         <v-img
           class="mx-auto my-6"
           max-width="228"

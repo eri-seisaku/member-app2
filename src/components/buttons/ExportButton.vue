@@ -2,6 +2,7 @@
   <div>
     <v-btn
       variant="outlined"
+      class="bg-white"
       min-height="40"
       @click="fetchData"
       :loading="isLoading"

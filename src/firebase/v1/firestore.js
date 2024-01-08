@@ -12,6 +12,8 @@ import {
   deleteDoc,
   writeBatch, // バッチ処理(複数の書き込み)
   // arrayUnion // 配列内の一意の値を追加
+  query,
+  where
 } from "firebase/firestore";
 
 // 更新 - 1階層 - ユーザーの単数データ
@@ -213,7 +215,64 @@ export async function getOneLevelAllData(collectionName) {
 }
 
 // 取得 - 全 - 2階層
+export async function getTwoLevelAllData(firstCollectionName, secondCollectionName) {
+  try {
+    const firstCollectionRef = collection(db, firstCollectionName);
 
+    const firstSnapshot = await getDocs(firstCollectionRef);
+    const allData = [];
+
+    // デバック
+    // firstSnapshot.forEach((doc) => {
+    //   console.log(doc.id);
+    // });
+
+    // const userIds = firstSnapshot.docs.map(doc => doc.id);
+    // console.log(userIds);  // ユーザーIDの配列を表示
+
+    for (const userDoc of firstSnapshot.docs) {
+      const userID = userDoc.id;
+      const secondCollectionRef = collection(userDoc.ref, secondCollectionName);
+      const secondSnapshot = await getDocs(secondCollectionRef);
+
+      secondSnapshot.forEach((postDoc) => {
+        allData.push({ userID, postID: postDoc.id, ...postDoc.data() });
+      });
+    }
+
+    return allData;
+  } catch (error) {
+    console.error('取得エラーby Firestore:', error);
+    throw error;
+  }
+}
+
+// フィルター
+export async function getTwoLevelFilteredData(firstCollectionName, secondCollectionName, filterField, filterValue) {
+  try {
+    const firstCollectionRef = collection(db, firstCollectionName);
+
+    const firstSnapshot = await getDocs(firstCollectionRef);
+    const allData = [];
+
+    for (const userDoc of firstSnapshot.docs) {
+      const userID = userDoc.id;
+      const secondCollectionRef = collection(userDoc.ref, secondCollectionName);
+
+      // whereクエリを使用して特定の条件を指定
+      const querySnapshot = await getDocs(query(secondCollectionRef, where(filterField, "==", filterValue)));
+
+      querySnapshot.forEach((postDoc) => {
+        allData.push({ userID, postID: postDoc.id, ...postDoc.data() });
+      });
+    }
+
+    return allData;
+  } catch (error) {
+    console.error('取得エラーby Firestore:', error);
+    throw error;
+  }
+}
 
 // ログに記録
 export async function recordLog(userID, docID, logMassage) {
@@ -237,7 +296,7 @@ export async function recordLog(userID, docID, logMassage) {
       date: new Date(),
       log: logMassage,
       memberID: userID,
-      portfolioID: docID
+      portfolioID: docID ? docID: ''
     }
     await addOneLevelSingleData("logs", log);
   }

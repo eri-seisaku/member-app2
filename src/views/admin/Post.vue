@@ -78,6 +78,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 const user = ref({});
+const userDoc= ref({});
 const message = ref('');
 const errorMessage = ref('');
 
@@ -117,6 +118,7 @@ state.value.value = 'save';
 import { upload } from '@/firebase/v1/storage';
 import { getCurrentUser } from '@/firebase/v1/auth';
 import {
+  getOneLevelSingleData,
   addTwoLevelSingleData,
   addElementToArray,
   recordLog
@@ -131,6 +133,8 @@ const router = useRouter();
 onMounted(async() => {
   try {
     user.value = await getCurrentUser();
+    userDoc.value = await getOneLevelSingleData(user.value.uid, "members");
+
   } catch (error) {
     console.error('ユーザー情報を読み込みできませんでした', error);
     errorMessage.value = 'ユーザー情報を読み込みできませんでした';
@@ -147,6 +151,8 @@ const submit = handleSubmit(async (values) => {
       [url, fileInfo] = await upload("portfolio", portfolioImage, user.value.uid);
     }
 
+    // otherValues.memberID = userDoc.value.memberID;
+    otherValues.name = userDoc.value.name;
     otherValues.storagePath = url;
 
     const secondDocID = await addData(otherValues, fileInfo);
@@ -160,7 +166,7 @@ const submit = handleSubmit(async (values) => {
 
     handleReset();
 
-    router.push(`/admin/portfolio/${secondDocID}`);
+    router.push(`/admin/portfolio/${user.value.uid}/${secondDocID}`);
 
   } catch (error) {
     console.error('更新エラー', error);

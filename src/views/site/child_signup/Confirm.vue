@@ -53,6 +53,8 @@ const props = defineProps({
   value: Object,
 });
 
+console.log(props.value)
+
 const transformedData = computed(() => {
   const data = {};
   const transformed = {};
@@ -85,6 +87,9 @@ const transformedData = computed(() => {
   transformed['建物名'] = data['addressLine2'];
   transformed['業種'] = data['industry'];
   transformed['専門デザイン分野'] = data['specialty'];
+  transformed['添付ファイル(1)'] = data['userUniqueFile'] && data['userUniqueFile'][0] ? data['userUniqueFile'][0].name : '';
+  transformed['添付ファイル(2)'] = data['portfolioFile'] && data['portfolioFile'][0] ? data['portfolioFile'][0].name : '';
+
   transformed['利用規約'] = data['checkbox'] === '1' ? '同意します' : '';
 
   // 不要なプロパティを除外

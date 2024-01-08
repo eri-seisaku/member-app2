@@ -48,9 +48,20 @@ export const states = [
   '鹿児島県',
   '沖縄県',
 ];
+export const eightAreas = [
+  '北海道',
+  '東北',
+  '関東',
+  '中部',
+  '近畿',
+  '中国',
+  '四国',
+  '九州沖縄',
+];
+
 
 // 八区分
-export const eightAreas = {
+const eightAreasWithStates = {
   '北海道': '北海道',
   '青森県': '東北',
   '岩手県': '東北',
@@ -102,8 +113,8 @@ export const eightAreas = {
 
 // 都道府県を八地方区分する
 export function setEightArea(state) {
-  if (state in eightAreas) {
-    const area = eightAreas[state];
+  if (state in eightAreasWithStates) {
+    const area = eightAreasWithStates[state];
     return area;
   } else {
     return 'エリア未定義';

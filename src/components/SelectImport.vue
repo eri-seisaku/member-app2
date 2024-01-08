@@ -5,6 +5,7 @@
       variant="outlined"
       density="compact"
       label="選択してください"
+      bg-color="white"
       :items="items"
       hide-details
       class="mr-3 custom-width"
@@ -32,7 +33,7 @@
 <script setup>
 import { ref } from 'vue';
 const fileInput = ref(null);
-const selectedData = ref('');
+const selectedData = ref(null);
 
 const items = [
   'メンバー',

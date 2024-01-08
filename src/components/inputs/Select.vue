@@ -3,6 +3,7 @@
     variant="outlined"
     density="compact"
     bg-color="white"
+    single-line
     label="選択してください"
     :items="items"
     v-model="parentField.value.value"

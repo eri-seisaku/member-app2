@@ -5,8 +5,7 @@
         <v-btn
           class="bg-white"
           variant="outlined"
-          @click="$router.push('/admin/post')"
-          :disabled="numberOfPosts >= 5"
+          href='/admin/post'
         >
           新規追加
         </v-btn>
@@ -96,7 +95,14 @@
             </template>
             <template v-slot:item.state="{ item }">
               <v-chip :color="getColor(item.state, item.requestReady)">
-                {{ getItemStatus(item.state, item.requestReady) }}
+                <!-- {{ item.state === 'request' ? '申請中' : '下書き' }} -->
+                {{
+                  item.state === 'request' && item.requestReady
+                    ? '申請中'
+                    : item.state === 'save' && item.requestReady
+                    ? '未申請'
+                    : '下書き'
+                }}
               </v-chip>
             </template>
             <template v-slot:item.title="{ item }">
@@ -127,7 +133,6 @@ const portfolios = ref([]);
 const selected = ref([]); // 投稿ID
 const allSelected = ref(false);
 const selectedAction = ref([]); // 削除or申請
-const numberOfPosts = ref('');
 const message = ref('');
 const errorMessage = ref('');
 const selectItems = [
@@ -153,29 +158,9 @@ const headers = [
 // });
 
 const getColor = (state, requestReady) => {
-  if (state === 'approved') {
-    return 'success';
-  } else if (state === 'request' && requestReady) {
-    return 'primary';
-  } else if (state === 'save' && requestReady) {
-    return 'orange';
-  } else {
-    return 'gray';
-  }
-};
-
-const getItemStatus = (state, requestReady) => {
-  if (state === 'approved') {
-    return '承認済';
-  } else if (state === 'request' && requestReady) {
-    return '申請中';
-  } else if (state === 'save' && requestReady) {
-    return '未申請';
-  } else if (state === 'save') {
-    return '下書き';
-  } else {
-    return '準備中';
-  }
+  if (state === 'request') return 'green'
+  else if (state === 'save' && requestReady === true) return 'primary'
+  else return 'gray'
 };
 
 const toggleSelectAllItems = () => {
@@ -238,13 +223,9 @@ onMounted(async () => {
       requestReady: doc.requestReady
     }));
 
-    console.log(portfolios.value)
-
     // 投稿数を取得
-    numberOfPosts.value = portfolios.value.length;
-    if (numberOfPosts.value >= 5) {
-      message.value = '最大投稿数は5作品までです。新規で投稿したい場合は既存の投稿を削除してください。'
-    }
+    const numberOfPosts = portfolios.value.length;
+    console.log('投稿数:', numberOfPosts);
 
     loading.value = false;
 

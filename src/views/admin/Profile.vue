@@ -109,7 +109,6 @@ import { getOneLevelSingleData } from '@/firebase/v1/firestore';
 
 onMounted(async () => {
   try {
-    // user.value = await getCurrentUser();
     if (route.params.userID) {
       userID.value = route.params.userID;
     } else {

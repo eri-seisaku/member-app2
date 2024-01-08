@@ -59,12 +59,6 @@ const siteRoutes = [
         meta: { title: 'LIST'}
       },
       {
-        path: '/send',
-        name: 'Send',
-        component: () => import('@/views/site/Send.vue'),
-        meta: { title: 'SEND'}
-      },
-      {
         path: '/members/:userID',
         name: 'Detail',
         component: () => import('@/views/site/Detail.vue'),
@@ -93,20 +87,36 @@ const adminRoutes = [
         meta: { title: 'PROFILE', index: 2 }
       },
       {
-        path: '/admin/portfolio-list', // 管理者,正会員
+        path: '/admin/portfolio-list/:userID', // 管理者,正会員  // 変更
+        // path: '/admin/portfolio-list', // 管理者,正会員
         component: () => import('@/views/admin/PortfolioList.vue'),
         meta: { title: 'PORTFOLIO LIST', index: 3 }
       },
       {
-        path: '/admin/portfolio/:portfolioID', // 管理者,正会員
+        path: '/admin/portfolio/:userID/:portfolioID', // 管理者,正会員
+        // path: '/admin/portfolio/:portfolioID', // 管理者,正会員
         component: () => import('@/views/admin/Edit.vue'),
         meta: { title: 'EDIT', index: 3 }
       },
       {
         path: '/admin/post', // 管理者,正会員
         component: () => import('@/views/admin/Post.vue'),
-        meta: { title: 'POST', index: 3 }
+        meta: { title: 'POST', index: 3 },
+        beforeEnter: (to, from, next) => {
+          if (
+            from.meta.title !== 'PORTFOLIO LIST'
+          ) {
+            next('/admin');
+          } else {
+            next();
+          }
+        },
       },
+      // {
+      //   path: '/admin/post', // 管理者,正会員
+      //   component: () => import('@/views/admin/Post.vue'),
+      //   meta: { title: 'POST', index: 3 }
+      // },
       {
         path: '/admin/administrator/export-import', // 管理者
         component: () => import('@/views/admin/administrator/ExportImport.vue'),
@@ -121,6 +131,12 @@ const adminRoutes = [
         path: '/admin/administrator/approval', // 管理者
         component: () => import('@/views/admin/administrator/Approval.vue'),
         meta: { title: 'APPROVAL', index: 4 }
+      },
+      {
+        path: '/admin/post-v2',
+        name: 'PostV2',
+        component: () => import('@/views/admin/sample/PostV2.vue'),
+        meta: { title: 'POST2'}
       },
       {
         path: '/admin/test',

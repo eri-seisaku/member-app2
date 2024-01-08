@@ -13,8 +13,15 @@
               <v-btn
                 variant="text"
                 color="primary"
-                @click="moveNextPage(item.id)"
+                @click="moveNextPage(item.id,'profile')"
               >{{ item.name }}</v-btn>
+            </template>
+            <template v-slot:item.portfolioIDs="{ item }">
+              <v-btn
+                variant="text"
+                color="primary"
+                @click="moveNextPage(item.id,'portfolio-list')"
+              >{{ item.portfolioIDs }}</v-btn>
             </template>
           </v-data-table>
         </v-sheet>
@@ -31,8 +38,7 @@ const itemsPerPage = 20;
 const headers = [
   { title: '事業所名', align: 'start', key: 'officeName' },
   { title: '代表者名', align: 'start', key: 'name' },
-  { title: '地方', align: 'start', key: 'eightArea' },
-  { title: '都道府県', align: 'start', key: 'state' },
+  { title: '投稿数', align: 'start', key: 'portfolioIDs' },
   { title: '入会年月日', align: 'start', key: 'joinDate' },
   { title: 'メールアドレス', align: 'start', key: 'email' },
   { title: '権限', align: 'start', key: 'role' },
@@ -41,8 +47,9 @@ const headers = [
 // router
 import { useRouter } from 'vue-router';
 const router = useRouter();
-const moveNextPage = (id) => {
-  router.push(`/admin/profile/${id}`);
+
+const moveNextPage = (id, pageName) => {
+  router.push(`/admin/${pageName}/${id}`);
 }
 
 // firebase
@@ -61,7 +68,10 @@ onMounted(async () => {
       joinDate: doc.joinDate,
       email: doc.email,
       role: doc.role,
+      portfolioIDs: doc.portfolioIDs ? doc.portfolioIDs.length : 0
     }));
+
+    console.log(members.value)
 
     loading.value = false;
 

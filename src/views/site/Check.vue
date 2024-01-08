@@ -14,11 +14,16 @@
         ></v-checkbox>
         <v-btn
           type="submit"
-          variant="outlined"
+          variant="flat"
+          size="large"
+          color="primary"
           @click="redirectToSignup"
           :disabled="!isAllChecked"
         >
           登録フォームへ
+          <template v-slot:append>
+            <v-icon color="white">mdi-chevron-right</v-icon>
+          </template>
         </v-btn>
       </v-col>
     </v-row>
@@ -33,9 +38,9 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const checkboxItems = ref([
-  { label: '税務署に確定申告書を提出している', value: false },
-  { label: '確定申告書の職業欄に当協会に加入出来る職業名が記載されている', value: false },
-  { label: '業務として制作された作品のプリントコピーを添付出来る', value: false },
+  { label: '加入前の確認事項01を満たしている', value: false },
+  { label: '加入前の確認事項02を満たしている', value: false },
+  { label: '加入前の確認事項03を満たしている', value: false },
 ]);
 
 const isAllChecked = computed(() => {

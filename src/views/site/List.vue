@@ -1,45 +1,47 @@
 <template>
-  <v-row>
-    <v-col cols="12" md="12">
-      <h2 class="text-h5">LIST</h2>
-      <v-data-table
-        v-model:items-per-page="itemsPerPage"
-        v-model:expanded="expanded"
-        :headers="headers"
-        :items="filteredMembers"
-        :loading="loadingMembers"
-        :search="search"
-        show-expand
-      >
-        <template v-slot:top>
-          <v-row class="my-8">
-            <v-col cols="12" md="6">
-              <EightArea
-                @selected="handleAreaSelected"
-                @reset="handleTableReset"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <SearchForm
-                @searched="handleFormSubmitted"
-                @reset="handleTableReset"
-              />
-            </v-col>
-          </v-row>
-        </template>
-        <template v-slot:expanded-row="{ columns, item }">
-          <tr>
-            <td class="bg-grey-lighten-5" :colspan="columns.length">
-              <a :href="item.url" class="text-decoration-underline text-black">
-                <v-icon> mdi-account-edit </v-icon>
-                Portfolio
-              </a>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
-    </v-col>
-  </v-row>
+  <v-container>
+    <v-row>
+      <v-col cols="12" md="12">
+        <h2 class="text-h5">組合員紹介</h2>
+        <v-data-table
+          v-model:items-per-page="itemsPerPage"
+          v-model:expanded="expanded"
+          :headers="headers"
+          :items="filteredMembers"
+          :loading="loadingMembers"
+          :search="search"
+          show-expand
+        >
+          <template v-slot:top>
+            <v-row class="my-8">
+              <v-col cols="12" md="6">
+                <EightArea
+                  @selected="handleAreaSelected"
+                  @reset="handleTableReset"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <SearchForm
+                  @searched="handleFormSubmitted"
+                  @reset="handleTableReset"
+                />
+              </v-col>
+            </v-row>
+          </template>
+          <template v-slot:expanded-row="{ columns, item }">
+            <tr>
+              <td class="bg-grey-lighten-5" :colspan="columns.length">
+                <a :href="item.url" class="text-decoration-underline text-black">
+                  <v-icon> mdi-account-edit </v-icon>
+                  Portfolio
+                </a>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup>

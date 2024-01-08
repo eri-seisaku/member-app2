@@ -136,8 +136,8 @@ onMounted(async () => {
     user.value = await getCurrentUser();
     userData.value = await getOneLevelSingleData(user.value.uid, "members");
 
-    if (userData.value.profileIcon && userData.value.profileIcon.url) {
-      imageSrc.value = userData.value.profileIcon.url;
+    if (userData.value.profileIcon) {
+      imageSrc.value = userData.value.profileIcon;
     }
 
     navMenus.value = getMenu(user.value, userData.value.role);

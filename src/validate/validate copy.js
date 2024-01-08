@@ -19,7 +19,6 @@ const isValidDate = (value) => {
   return date instanceof Date && !isNaN(date) && formattedValue === date.toISOString().split('T')[0];
 };
 
-// 添付ファイルの確認
 const fileTypeTest = () => {
   return mixed().test('fileType', 'PNG、JPG、GIF、PDF、DOC、DOCX、PPT、PPTX形式のファイルをアップロードしてください', (value) => {
     if (!value) return true;
@@ -39,7 +38,6 @@ const fileTypeTest = () => {
   });
 };
 
-// 画像の確認
 const imageTypeTest = () => {
   return mixed().test('fileType', 'PNG、JPG、WEBP、GIF、SVG形式の画像をアップロードしてください', (value) => {
     if (!value) return true;
@@ -75,42 +73,14 @@ const commonSchema = {
   officeNameKana: string()
     .matches(/^[\p{Script=Katakana}\s]+$/u, 'カタカナで入力してください')
     .required(),
-  // 生年月日
-  birthday: string()
-    .matches(/^\d{4}\/\d{2}(\/\d{2})?$/, '半角数字8桁のYYYYMMDD形式でご記入ください。')
-    .test('isValidDate', '有効な日付を入力してください', isValidDate)
-    .required(),
-  // 郵便番号
-  zipCode: string()
-    .matches(/^\d{7}$/, '郵便番号はハイフンなしの7桁で入力する必要があります。')
-    .required(),
-  // 都道府県
-  state: string().required(),
-  // 住所1
-  addressLine1: string().required(),
-  // 住所2
-  addressLine2: string(),
-  // 電話番号
-  phone: string()
-    .matches(/^0\d{9,10}$/, 'ハイフンは入れずに半角数字でご記入ください。')
-    .min(9, '電話番号は9桁以上である必要があります.')
-    .required(),
-  // 携帯番号
-  mobile: string().when({
-    is: (value) => value && value.length > 0,
-    then: () => string().matches(/^0\d{9,10}$/, 'ハイフンは入れずに半角数字でご記入ください。').min(9, '携帯番号は9桁以上である必要があります.'),
+  // 画像
+  image: mixed()
+    .test('fileType', 'PNGまたはJPG形式の画像をアップロードしてください', (value) => {
+    if (!value) return true; // 値がない場合、バリデーションをスキップ
+    return (
+      value && (value.type === 'image/png' || value.type === 'image/jpeg')
+    );
   }),
-  // FAX番号
-  fax: string().when({
-    is: (value) => value && value.length > 0,
-    then: () => string().matches(/^0\d{9,10}$/, 'ハイフンは入れずに半角数字でご記入ください。').min(9, 'FAX番号は9桁以上である必要があります.'),
-  }),
-  // WEBサイト
-  website: string().url('有効なURLを入力してください。').nullable(),
-  // 専門分野
-  specialty: string().required('選択してください。'),
-  // 業種
-  industry: string().required(),
 };
 
 // 法人
@@ -133,10 +103,47 @@ const individualSchema = {
 // 会員登録
 export const validationSchema = object({
   ...commonSchema, // 共通
+  // ...corporationSchema, // 法人
+  // ...individualSchema, // 個人
+  userUniqueFile: fileTypeTest().required(),
+  // 制作実績
+  portfolioFile: fileTypeTest().required(),
+  email: string().email().required(),
   // 種別
   userType: string().required(),
-  // メールアドレス
-  email: string().email().required(),
+  // 資本金
+  capital: string().matches(/^[0-9]+$/, '数字のみ入力してください'),
+  // 生年月日
+  birthday: string()
+    .matches(/^\d{4}\/\d{2}(\/\d{2})?$/, '半角数字8桁のYYYYMMDD形式でご記入ください。')
+    .test('isValidDate', '有効な日付を入力してください', isValidDate)
+    .required(),
+  // 設立年月日
+  incorporationDate: string()
+    .matches(/^\d{4}\/\d{2}(\/\d{2})?$/, '半角数字8桁のYYYYMMDD形式でご記入ください。')
+    .test('isValidDate', '有効な日付を入力してください', isValidDate)
+    .required(),
+  // 郵便番号
+  zipCode: string()
+    .matches(/^\d{7}$/, '郵便番号はハイフンなしの7桁で入力する必要があります。')
+    .required(),
+  // 都道府県
+  state: string().required(),
+  // 住所1
+  addressLine1: string().required(),
+  // 住所2
+  addressLine2: string(),
+  // 電話番号
+  phone: string()
+    .matches(/^0\d{9,10}$/, 'ハイフンは入れずに半角数字でご記入ください。')
+    .min(9, '電話番号は9桁以上である必要があります.')
+    .required(),
+  // 携帯番号
+  mobile: string().matches(/^0\d{9,10}$/, 'ハイフンは入れずに半角数字でご記入ください。').min(9, '携帯番号は9桁以上である必要があります.'),
+  // FAX番号
+  fax: string()
+    .matches(/^0\d{9,10}$/, 'ハイフンは入れずに半角数字でご記入ください。')
+    .min(9, 'FAX番号は9桁以上である必要があります。'),
   // パスワード
   password: string()
     .matches(
@@ -146,34 +153,18 @@ export const validationSchema = object({
     .min(8, 'パスワードは少なくとも8文字以上である必要があります')
     .max(64, 'パスワードは64文字以下である必要があります')
     .required(),
-  // 資本金
-  capital: string().matches(/^[0-9]+$/, '数字のみ入力してください'),
-  // 設立年月日
-  incorporationDate: string()
-    .matches(/^\d{4}\/\d{2}(\/\d{2})?$/, '半角数字8桁のYYYYMMDD形式でご記入ください。')
-    .test('isValidDate', '有効な日付を入力してください', isValidDate)
-    .required(),
-  // 種別ごとの添付ファイル
-  userUniqueFile: fileTypeTest().required(),
-  // 制作実績
-  portfolioFile: fileTypeTest().required(),
+  // WEBサイト
+  website: string().url('有効なURLを入力してください。').nullable(),
+  // 専門分野
+  specialty: string().required('選択してください。'),
+  // 業種
+  industry: string().required(),
   // 利用規約
   checkbox: string().oneOf(['1'], 'チェックする必要があります。').required(),
 });
 
 // プロフィール
-export const profileSchema = object({
-  ...commonSchema, // 共通
-  // 八区分
-  eightArea: string().required(),
-  // 加入年月日
-  joinDate: string()
-  .matches(/^\d{4}\/\d{2}(\/\d{2})?$/, '半角数字8桁のYYYYMMDD形式でご記入ください。')
-  .test('isValidDate', '有効な日付を入力してください', isValidDate)
-  .required(),
-  // 権限
-  role: string().required(),
-});
+export const profileSchema = commonSchema;
 
 // プロフィール - パスワード更新
 export const passwordSchema = object({

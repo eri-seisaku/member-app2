@@ -33,6 +33,7 @@
           </template>
           <template v-slot:item.portfolioID="{ item }">
             <v-btn
+              v-if="item.portfolioID"
               :href="item.portfolioID"
               variant="text"
               color="primary"
@@ -77,7 +78,7 @@ onMounted(async () => {
     logs.value = allDoc.map((doc) => ({
       log: doc.log,
       memberID: `/admin/profile/${doc.memberID}`,
-      portfolioID: `/admin/portfolio/${doc.portfolioID}`,
+      portfolioID: doc.portfolioID ? `/admin/portfolio/${doc.memberID}/${doc.portfolioID}` : '',
       date: formatDateForTimestamp(doc.date),
     }));
 

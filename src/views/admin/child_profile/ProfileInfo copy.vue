@@ -1,43 +1,42 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-sheet class="pa-6 mx-2" rounded>
-        <v-form @submit.prevent="submit">
-          <v-row>
-            <v-col cols="12" md="6" v-for="editInfo in editData">
-              <NormalLabel :label="editInfo.label" />
-              <TextField
-                :field="editInfo.field"
-                :hint="editInfo.hint"
-              />
-            </v-col>
-            <v-col cols="12" md="6" v-for="readInfo in readData">
-              <NormalLabel :label="readInfo.label" />
-              <v-text-field
-                v-model="readInfo.value.value"
-                density="compact"
-                variant="outlined"
-                :disabled="true"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
-              <v-btn
-                variant="outlined"
-                type="submit"
-              >
-                保存
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-form>
-        <Alert
-          v-if="message || errorMessage"
-          :color="message ? 'primary' : 'red'"
-          :text="message ? message : errorMessage"
-        />
-      </v-sheet>
+      <form @submit.prevent="submit">
+        <v-row>
+          <v-col cols="12" md="6" v-for="editInfo in editData">
+            <NormalLabel :label="editInfo.label" />
+            <TextField
+              :field="editInfo.field"
+              :hint="editInfo.hint"
+            />
+          </v-col>
+          <v-col cols="12" md="6" v-for="readInfo in readData">
+            <NormalLabel :label="readInfo.label" />
+            <v-text-field
+              v-model="readInfo.value.value"
+              density="compact"
+              variant="outlined"
+              :disabled="true"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-btn
+              variant="flat"
+              color="member"
+              type="submit"
+            >
+              保存
+            </v-btn>
+          </v-col>
+        </v-row>
+      </form>
+      <Alert
+        v-if="message || errorMessage"
+        :color="message ? 'primary' : 'red'"
+        :text="message ? message : errorMessage"
+      />
     </v-col>
   </v-row>
 </template>
@@ -51,6 +50,8 @@ const props = defineProps({
   authUID: String,
   dbData: Object
 });
+
+// console.log(props.dbData.role)
 
 // components
 import Alert from '@/components/Alert.vue';
@@ -67,9 +68,6 @@ const { handleSubmit } = useForm({
 
 // 読み取り専用
 const readData = [
-  { key: 'state', label: '都道府県', value: ref('')},
-  { key: 'eightArea', label: '八区分', value: ref('')},
-  { key: 'role', label: '権限', value: ref('')},
   { key: 'joinDate', label: '加入年月日', value: ref('')},
 ];
 // 編集専用
@@ -78,6 +76,11 @@ const editData = [
   { key: 'nameKana', field: useField('nameKana'), label: '代表者名(フリガナ)' },
   { key: 'officeName', field: useField('officeName'), label: '事務所名' },
   { key: 'officeNameKana', field: useField('officeNameKana'), label: '事務所名(フリガナ)' },
+  { key: 'state', field: useField('state'), label: '都道府県' },
+  { key: 'eightArea', field: useField('eightArea'), label: '八区分' },
+  { key: 'specialty', field: useField('specialty'), label: '専門分野' },
+  { key: 'industry', field: useField('industry'), label: '業種' },
+  { key: 'role', field: useField('role'), label: '権限' },
 ];
 
 onMounted(async () => {
@@ -103,7 +106,6 @@ import { updateOneLevelSingleData } from '@/firebase/v1/firestore';
 // 送信処理
 const submit = handleSubmit(async (values) => {
   try {
-    // console.log(values);
     // ユーザー情報を更新
     await updateOneLevelSingleData(props.authUID, "members", values);
     message.value = 'ユーザー情報の更新に成功しました。';

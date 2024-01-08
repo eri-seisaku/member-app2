@@ -5,6 +5,7 @@
       variant="outlined"
       density="compact"
       label="選択してください"
+      bg-color="white"
       :items="items"
       hide-details
       class="mr-3 custom-width"
@@ -26,7 +27,7 @@
 <script setup>
 import { ref } from 'vue';
 const csvData = ref([]);
-const selectedData = ref('');
+const selectedData = ref(null);
 const errorMessage = ref('');
 const isLoading = ref(false);
 const isDataReady = ref(false);
@@ -57,9 +58,9 @@ const fetchData = async () => {
       isDataReady.value = true;
 
     } else if (selectedData.value === 'ポートフォリオ') {
-      const allDoc = await getTwoLevelAllData("portfolios", "portfolio");
+      const allDoc = await getTwoLevelAllData("members", "portfolios");
       csvData.value = allDoc.map((doc) => {
-        const { createDateTimestamp, requestReady, ...otherProps } = doc;
+        const { createDateTimestamp, requestReady, portfolioImage, ...otherProps } = doc;
         return otherProps;
       });
       isDataReady.value = true;

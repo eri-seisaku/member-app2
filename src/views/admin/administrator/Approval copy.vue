@@ -46,34 +46,11 @@
             v-model:items-per-page="itemsPerPage"
             v-model="selected"
             :item-value="item => ({ portfolioID: item.portfolioID, memberID: item.memberID })"
+            show-select
             :headers="headers"
             :items="portfolios"
             :loading="loading"
           >
-            <!-- header -->
-            <template v-slot:headers>
-              <tr>
-                <th>
-                  <v-checkbox
-                    hide-details
-                    @click="toggleSelectAllItems"
-                  ></v-checkbox>
-                </th>
-                <th>{{ headers[1].title }}</th>
-                <th>{{ headers[2].title }}</th>
-                <th>{{ headers[3].title }}</th>
-                <th>{{ headers[4].title }}</th>
-              </tr>
-            </template>
-            <!-- checkbox -->
-            <template v-slot:item.portfolioID="{ item }">
-              <v-checkbox
-                v-if="selectedAction.value === 'approved'"
-                v-model="selected"
-                :true-value="{ portfolioID: item.portfolioID, memberID: item.memberID }"
-                hide-details
-              ></v-checkbox>
-            </template>
             <template v-slot:item.title="{ item }">
               <v-btn
                 variant="text"
@@ -99,7 +76,6 @@
 import { ref, onMounted, watch } from "vue";
 const portfolios = ref([]);
 const selected = ref([]); // 投稿ID
-const allSelected = ref(false);
 const selectedAction = ref([]); // 削除or申請
 const message = ref('');
 const errorMessage = ref('');
@@ -110,7 +86,6 @@ const selectItems = [
 const itemsPerPage = 10;
 const loading = ref(true);
 const headers = [
-  { title: '', align: 'start', key: 'portfolioID', sortable: false },
   { title: 'メンバー', align: 'start', key: 'name' },
   { title: 'タイトル', align: 'start', key: 'title' },
   { title: '日付', align: 'start', key: 'createDateTimestamp' },
@@ -119,6 +94,12 @@ const headers = [
 
 // component
 import Alert from '@/components/Alert.vue';
+
+// firebase
+import {
+  getTwoLevelFilteredData,
+  updateTwoLevelMultipleData
+} from '@/firebase/v1/firestore';
 
 // utils
 import { formatDateForTimestamp } from '@/utils/formatData'; // 日付形式変換
@@ -137,27 +118,12 @@ const truncateTitle = (title) => {
   return title.length > 20 ? title.substring(0, 20) + "..." : title;
 }
 
-const toggleSelectAllItems = () => {
-  if (allSelected.value) {
-    selected.value = [];
-  } else {
-    selected.value = portfolios.value.map(item => ({ portfolioID: item.portfolioID, memberID: item.memberID }));
-  }
-  allSelected.value = !allSelected.value; // 選択状態を反転
-};
-
 watch(() => selected.value, (newVal) => {
   console.log(selected.value);
 });
 watch(() => selectedAction.value, (newVal) => {
   console.log(selectedAction.value);
 });
-
-// firebase
-import {
-  getTwoLevelFilteredData,
-  updateTwoLevelMultipleData
-} from '@/firebase/v1/firestore';
 
 // 取得
 onMounted(async () => {

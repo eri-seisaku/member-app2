@@ -97,7 +97,7 @@
   </v-container>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 const userID = ref('');
 const portfolioData = ref({});
 const isReady = ref(false);
@@ -128,6 +128,12 @@ const genre = useField('genre');
 const storagePath = useField('storagePath');
 const portfolioImage = useField('portfolioImage');
 
+console.log(storagePath.value.value)
+
+watch(() => portfolioImage.value.value, (newVal) => {
+  console.log(portfolioImage.value.value);
+});
+
 // route
 import { useRoute } from 'vue-router';
 const route = useRoute();
@@ -142,6 +148,12 @@ import { getOneLevelSingleData, getTwoLevelSingleData, updateTwoLevelSingleData,
 
 onMounted(async() => {
   try {
+    // if (route.params.userID) {
+    //   userID.value = route.params.userID;
+    // } else {
+    //   const currentUser = await getCurrentUser();
+    //   userID.value = currentUser.uid;
+    // }
     // ルートから取得したID
     userID.value = route.params.userID;
 
@@ -175,20 +187,31 @@ onMounted(async() => {
 // 送信処理
 const submit = handleSubmit(async (values) => {
   const { portfolioImage, ...otherValues } = values;
+  let url;
+  let fileInfo;
   try {
-    // 新しく画像がアップロードされたらstorageに保存
-    if (portfolioImage instanceof File) {
-      let url;
-      let fileInfo;
-      [url, fileInfo] = await upload("portfolio", portfolioImage, userID.value);
+
+    console.log(portfolioImage);
+    console.log(otherValues);
+    console.log(url);
+
+    // 正会員が保存できる範囲
+    if (loginUser.value.role === role.fullMember) {
+      if (portfolioImage instanceof File) {
+        [url, fileInfo] = await upload("portfolio", portfolioImage, userID.value);
+      }
+
       otherValues.storagePath = url;
-      otherValues.portfolioImage = fileInfo;
-    }
 
-    await updateData(otherValues);
+      await updateData(otherValues, fileInfo);
 
-    if (otherValues.state === 'request') {
-      await recordLog(userID.value, route.params.portfolioID, 'ポートフォリオが申請されました');
+      if (otherValues.state === 'request') {
+        await recordLog(userID.value, route.params.portfolioID, 'ポートフォリオが申請されました');
+      }
+
+    // 管理者が保存できる範囲
+    } else if (loginUser.value.role === role.administrator) {
+      await updateData(otherValues, '')
     }
 
     message.value = '変更内容を保存しました。';
@@ -200,12 +223,15 @@ const submit = handleSubmit(async (values) => {
 });
 
 // フォームデータの登録
-const updateData = async (values) => {
-  const isEmpty = Object.values(values).some(value => !value);
+const updateData = async (values, fileInfo) => {
+  const isEmpty = Object.values(values).some(value => !value) || !fileInfo;
   if (isEmpty) {
     values.requestReady = false;
   } else {
     values.requestReady = true;
+  }
+  if (fileInfo) {
+    values.portfolioImage = fileInfo;
   }
   await updateTwoLevelSingleData(userID.value, "members", "portfolios", route.params.portfolioID, values);
 }

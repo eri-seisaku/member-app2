@@ -1,13 +1,13 @@
 <template>
-  <v-row>
+  <v-row class="justify-center">
     <v-col cols="12">
       <h2 class="text-h5">加入のお申し込みについて</h2>
     </v-col>
   </v-row>
-  <v-row class="custom-color">
+  <v-row class="custom-color justify-center">
     <!-- align-self="center"をつけると高さがそろわない -->
     <!-- <v-col cols="12" md="3" align-self="center"> -->
-    <v-col cols="12" md="4">
+    <v-col cols="12" md="3">
       <RequiredLabel label="種別" />
     </v-col>
     <v-col cols="12" md="8">
@@ -22,11 +22,11 @@
     </v-col>
   </v-row>
   <!-- textFields -->
-  <v-row v-for="fieldInfo in textFields" :key="fieldInfo.key" class="custom-color">
-    <v-col cols="12" md="4" v-if="fieldInfo.type !== 'optional'">
+  <v-row v-for="fieldInfo in textFields" :key="fieldInfo.key" class="custom-color justify-center">
+    <v-col cols="12" md="3" v-if="fieldInfo.type !== 'optional'">
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
-    <v-col cols="12" md="4" v-else>
+    <v-col cols="12" md="3" v-else>
       <OptionalLabel :label="fieldInfo.label" />
     </v-col>
     <v-col cols="12" md="8" class="d-flex align-center">
@@ -42,8 +42,8 @@
   </v-row>
   <!-- /textFields -->
   <!-- dateFields -->
-  <v-row v-for="fieldInfo in dateFields" :key="fieldInfo.key" class="custom-color">
-    <v-col cols="12" md="4">
+  <v-row v-for="fieldInfo in dateFields" :key="fieldInfo.key" class="custom-color justify-center">
+    <v-col cols="12" md="3">
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
     <v-col cols="12" md="8" class="d-flex align-center">
@@ -57,8 +57,8 @@
   </v-row>
   <!-- /dateFields -->
   <!-- password -->
-  <v-row class="custom-color">
-    <v-col cols="12" md="4">
+  <v-row class="custom-color justify-center">
+    <v-col cols="12" md="3">
       <RequiredLabel label="パスワード" />
     </v-col>
     <v-col cols="12" md="8">
@@ -67,8 +67,8 @@
   </v-row>
   <!-- /password -->
   <!-- address -->
-  <v-row class="custom-color">
-    <v-col cols="12" md="4">
+  <v-row class="custom-color justify-center">
+    <v-col cols="12" md="3">
       <RequiredLabel label="郵便番号" />
     </v-col>
     <v-col cols="12" md="8" class="d-flex">
@@ -78,7 +78,7 @@
       />
       <v-btn
         variant="outlined"
-        class="ml-4 bg-white"
+        class="ml-6"
         min-height="40"
         :disabled="!!zipCode.errorMessage.value || !zipCode.value.value"
         @click="searchAddress"
@@ -90,8 +90,8 @@
       <p class="text-red-lighten-1 text-subtitle-2">{{ message }}</p>
     </v-col>
   </v-row>
-  <v-row class="custom-color">
-    <v-col cols="12" md="4">
+  <v-row class="custom-color justify-center">
+    <v-col cols="12" md="3">
       <RequiredLabel label="都道府県" />
     </v-col>
     <v-col cols="12" md="8">
@@ -101,11 +101,11 @@
       />
     </v-col>
   </v-row>
-  <v-row v-for="fieldInfo in addressFields" :key="fieldInfo.key" class="custom-color">
-    <v-col cols="12" md="4" v-if="fieldInfo.type !== 'optional'">
+  <v-row v-for="fieldInfo in addressFields" :key="fieldInfo.key" class="custom-color justify-center">
+    <v-col cols="12" md="3" v-if="fieldInfo.type !== 'optional'">
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
-    <v-col cols="12" md="4" v-else>
+    <v-col cols="12" md="3" v-else>
       <OptionalLabel :label="fieldInfo.label" />
     </v-col>
     <v-col cols="12" md="8">
@@ -118,8 +118,8 @@
   </v-row>
   <!-- /address -->
   <!-- category -->
-  <v-row v-for="fieldInfo in categoryFields" :key="fieldInfo.key" class="custom-color">
-    <v-col cols="12" md="4">
+  <v-row v-for="fieldInfo in categoryFields" :key="fieldInfo.key" class="custom-color justify-center">
+    <v-col cols="12" md="3">
       <RequiredLabel :label="fieldInfo.label" />
     </v-col>
     <v-col cols="12" md="8">
@@ -130,33 +130,9 @@
     </v-col>
   </v-row>
   <!-- /category -->
-  <!-- file upload -->
-  <v-row class="custom-color">
-    <v-col cols="12" md="4">
-      <RequiredLabel label="添付ファイル(1)" />
-    </v-col>
-    <v-col cols="12" md="8">
-      <FileInput
-        :label="userType.value.value === '法人' ? '履歴事項全部証明（3ヶ月以内）' : '所得税および復興特別所得税の申告書コピー'"
-        :field="userUniqueFile"
-      />
-    </v-col>
-  </v-row>
-  <v-row class="custom-color">
-    <v-col cols="12" md="4">
-      <RequiredLabel label="添付ファイル(2)" />
-    </v-col>
-    <v-col cols="12" md="8">
-      <FileInput
-        label="デザイン制作実績"
-        :field="portfolioFile"
-      />
-    </v-col>
-  </v-row>
-  <!-- /file upload -->
   <!-- checkbox -->
-  <v-row class="custom-color">
-    <v-col cols="12" md="4">
+  <v-row class="custom-color justify-center">
+    <v-col cols="12" md="3">
       <RequiredLabel label="利用規約" />
     </v-col>
     <v-col cols="12" md="8">
@@ -171,12 +147,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 const message = ref(''); // 郵便番号検索時のメッセージ
 
 // components
 import TextField from '@/components/inputs/TextField.vue';
-import FileInput from '@/components/inputs/FileInput.vue';
 import Select from '@/components/inputs/Select.vue';
 import PasswordFieldWithChip from '@/components/inputs/PasswordFieldWithChip.vue';
 import CheckBox from '@/components/inputs/CheckBox.vue';
@@ -209,16 +184,11 @@ const addressFields = addressInputItems.map(fieldInfo => {
 const categoryFields = categoryInputItems.map(fieldInfo => {
   return { ...fieldInfo, field: useField(fieldInfo.key) };
 });
-const userType = useField('userType');
+const userType = useField('userType'); // 種別
 const password = useField('password');
 const checkbox = useField('checkbox');
 const zipCode = useField('zipCode');
 const state = useField('state');
-const userUniqueFile = useField('userUniqueFile');
-const portfolioFile = useField('portfolioFile');
-
-// 初期値
-userType.value.value = '個人';
 
 // 入力された日付に/を入れる
 const formatDate = (value, dateField) => {

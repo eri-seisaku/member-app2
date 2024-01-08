@@ -28,7 +28,7 @@
           variant="outlined"
           href='/login'
         >
-          LOGIN
+          ログイン
         </v-btn>
 
     </v-app-bar>
@@ -46,37 +46,25 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main class="bg-grey-lighten-3">
+    <v-main class="bg-white">
+    <!-- <v-main class="bg-grey-lighten-3"> -->
       <v-container>
         <v-row>
-          <v-col cols="12" md="10">
-            <v-sheet
-              min-height="70vh"
-              rounded="lg"
-              class="pa-8"
-            >
-              <router-view />
-            </v-sheet>
+          <v-col cols="12" md="9">
+            <router-view />
           </v-col>
-          <v-col cols="12" md="2">
-            <v-sheet rounded="lg">
-              <v-list rounded="lg">
-                <v-list-item
-                  v-for="n in 5"
-                  :key="n"
-                  link
-                  :title="`List Item ${n}`"
-                ></v-list-item>
-
-                <v-divider class="my-2"></v-divider>
-
-                <v-list-item
-                  color="grey-lighten-4"
-                  link
-                  title="Refresh"
-                ></v-list-item>
-              </v-list>
-            </v-sheet>
+          <v-col cols="12" md="3">
+            <v-hover v-for="n in 3" :key="n">
+              <template v-slot:default="{ isHovering, props }">
+                <v-card
+                  v-bind="props"
+                  :color="isHovering ? 'grey' : undefined"
+                  variant="tonal"
+                  height="120"
+                  class="d-flex justify-center align-center mb-2"
+                >サンプルバナー</v-card>
+              </template>
+            </v-hover>
           </v-col>
         </v-row>
       </v-container>
@@ -104,15 +92,15 @@ onMounted(() => {
 
 const navMenus = [
   {
-    title: 'HOME',
+    title: 'ホーム',
     to: '/'
   },
   {
-    title: 'INFO',
+    title: '加入案内',
     to: '/info'
   },
   {
-    title: 'LIST',
+    title: '組合員紹介',
     to: '/list'
   },
 ];

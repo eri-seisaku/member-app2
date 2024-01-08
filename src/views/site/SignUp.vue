@@ -47,7 +47,11 @@ import SignUpForm from '@/views/site/child_signup/SignUpForm.vue';
 
 // firebase
 import { signUp } from '@/firebase/v1/auth';
-import { setOneLevelSingleData } from '@/firebase/v1/firestore';
+import {
+  setOneLevelSingleData,
+  recordLog
+} from '@/firebase/v1/firestore';
+import { upload } from '@/firebase/v1/storage';
 
 // functions
 import { sendMail } from "@/firebase/firebase";
@@ -94,22 +98,38 @@ const submit = handleSubmit(async (values) => {
       inputValues.value = values;
 
     } else {
-      const formattedInputData = formatFormValues(values);
+      const { userUniqueFile, portfolioFile, ...otherValues } = values;
 
+      // undefinedは保存できないため空白に
+      const formattedInputData = formatFormValues(otherValues);
+
+      // authに保存
       const user = await signUp(formattedInputData.email, formattedInputData.password);
 
+      // storageに保存
+      const [userUniqueFileURL, userUniqueFileMetadata] = await upload("members", userUniqueFile[0], user.uid);
+
+      const [portfolioFileURL, portfolioFileMetadata] = await upload("members", portfolioFile[0], user.uid);
+
+      // firestoreに保存
       const otherData = {
         memberID: user.uid,
         eightArea: setEightArea(formattedInputData.state),
         role: role.member,
         joinDate: new Date().toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" }),
         createDateTimestamp: new Date(),
+        userUniqueFileURL: userUniqueFileURL,
+        portfolioFileURL: portfolioFileURL
       };
 
-      ["checkbox", "password"].forEach(key => delete formattedInputData[key]); // 登録したくない物を削除
+      // 登録したくない物を削除
+      ["checkbox", "password"].forEach(key => delete formattedInputData[key]);
 
       const userData = { ...formattedInputData, ...otherData };
       await setOneLevelSingleData(user.uid, "members", userData);
+
+      // ログに記録
+      await recordLog(user.uid, "", "会員申請されました");
 
       // メール送信
       const sendData = {

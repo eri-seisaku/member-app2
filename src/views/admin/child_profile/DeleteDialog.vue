@@ -22,7 +22,7 @@
                     <p class="mb-5 px-4">年</p>
                   </v-col>
                   <v-col cols="12" sm="6" class="d-flex align-center">
-                    <SelectField
+                    <Select
                       :field="cancellationMonth"
                       :items="selectMonth"
                     />
@@ -143,7 +143,7 @@ const props = defineProps({
 
 // components
 import TextField from '@/components/inputs/TextField.vue';
-import SelectField from '@/components/inputs/SelectField.vue';
+import Select from '@/components/inputs/Select.vue';
 import TextArea from '@/components/inputs/TextArea.vue';
 import Dialog from '@/components/Dialog.vue';
 import Alert from '@/components/Alert.vue';

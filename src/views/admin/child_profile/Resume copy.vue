@@ -72,8 +72,9 @@ const props = defineProps({
 });
 
 if (props.dbData.profileIcon) {
-  imageSrc.value = props.dbData.profileIcon;
+  imageSrc.value = props.dbData.profileIcon.url;
 }
+
 
 // components
 import Alert from '@/components/Alert.vue';
@@ -123,19 +124,17 @@ onMounted(async () => {
 // 送信処理
 const submit = handleSubmit(async (values) => {
   try {
-
-    let url;
-    let fileInfo;
+    let uploadResult;
     if (fileData.value) {
-      [url, fileInfo] = await upload("profile", fileData.value, props.authUID);
+      uploadResult = await upload("profile", fileData.value, props.authUID);
     }
     const formattedInputData = formatFormValues(values);
 
-    console.log([url, fileInfo])
-    if ([url, fileInfo]) {
-      formattedInputData.profileIcon = url;
-    }
-    await updateOneLevelSingleData(props.authUID, "members", formattedInputData);
+    console.log(uploadResult)
+    // if (uploadResult) {
+    //   formattedInputData.profileIcon = uploadResult;
+    // }
+    // await updateOneLevelSingleData(props.authUID, "members", formattedInputData);
     message.value = '更新に成功しました。';
   } catch (error) {
     console.error('更新エラー', error);
